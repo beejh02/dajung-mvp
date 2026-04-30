@@ -26,10 +26,12 @@
 - 관리자 대시보드 반영
 - 기업 MCP 서버
 - Streamlit 텍스트 채팅형 AI Agent
-- `models/gemma-4-26b-a4b-it` 모델 기반 Agent 응답
+- `models/gemma-4-26b-a4b-it` 목표 모델을 향한 `LLMProvider` 기반 Agent 응답 구조
+- API Key 없이 실행 가능한 `StubLLMProvider` 기반 demo mode
 - RAG 확장을 고려한 폴더/인터페이스 구조
 - SQLite + SQLModel 기반 로컬 DB
 - JWT + 일회성 handoff token 기반 인증 흐름
+- 더미 DB 조회 기반 개인화 시나리오
 
 ### 제외
 
@@ -68,14 +70,14 @@ Streamlit Agent
   ├─ Text Chat UI
   ├─ Dajung Session Handoff
   ├─ Tool Calling Layer
-  └─ Gemma Model Client
+  ├─ LLMProvider Interface
+  └─ StubLLMProvider Demo Mode
 
 Enterprise MCP Server
-  ├─ Menu Tools
-  ├─ User Context Tools
-  ├─ Order Tools
-  ├─ Payment/Receipt Tools
-  └─ Admin/Analytics Tools
+  ├─ FastAPI Fake MCP HTTP API
+  ├─ MCP-like Tool Schemas
+  ├─ Tool Adapter Layer
+  └─ Business Tools
 
 SQLite Dummy DB
   ├─ users
@@ -472,10 +474,13 @@ AI Agent는 자체 DB 접근 없이 백엔드 API만 호출합니다. Agent 주�
 
 ### 모델
 
-- 모델 식별자: `models/gemma-4-26b-a4b-it`
-- 모델 클라이언트는 `ai-agent/app/model_client.py`에서 추상화합니다.
-- 실제 제공자 SDK 또는 API 형식이 확정되기 전에는 fake/stub client로 E2E 흐름을 먼저 살립니다.
-- 모델 클라이언트는 provider 교체가 가능하도록 `generate_response`, 도구 호출 요청 파싱, 오류 변환을 인터페이스로 분리합니다.
+- 목표 모델 식별자: `models/gemma-4-26b-a4b-it`
+- 초기 MVP에서는 실제 모델 API를 바로 연결하지 않고 `LLMProvider` 추상 인터페이스로 모델 호출 경계를 분리합니다.
+- 초기 구현은 `StubLLMProvider`로 시작합니다.
+- `StubLLMProvider`는 사용자 입력에 따라 미리 정의된 intent JSON을 반환해 주문 E2E 흐름을 검증합니다.
+- API Key가 없어도 Streamlit Agent는 demo mode로 실행 가능해야 합니다.
+- 추후 실제 provider는 Google Gemini API 또는 Cloudflare Workers AI Provider로 교체할 수 있게 합니다.
+- 모델 클라이언트는 provider 교체가 가능하도록 `generate_response`, intent/tool 호출 요청 파싱, 오류 변환을 인터페이스로 분리합니다.
 
 ### Agent 도구
 
@@ -495,10 +500,13 @@ AI Agent는 자체 DB 접근 없이 백엔드 API만 호출합니다. Agent 주�
 - 모델 출력이 주문 JSON으로 검증되지 않으면 주문을 진행하지 않고 필요한 정보를 다시 묻습니다.
 - 실제 결제가 아닌 더미 결제임을 UI 또는 응답에서 명확히 표시합니다.
 - RAG를 사용하지 않으며 메뉴/주문 정보는 백엔드 API를 신뢰합니다.
+- 개인화 시나리오는 현재 더미 DB에서 조회한 사용자 컨텍스트를 기반으로 구현합니다.
 
 ## 10. MCP 서버 설계
 
-기업 MCP 서버는 다정의 내부 비즈니스 도구를 표준화된 MCP 도구로 노출합니다. MVP에서는 비즈니스 로직을 직접 구현하지 않고 FastAPI 백엔드 API를 호출하는 얇은 어댑터로 둡니다.
+기업 MCP 서버는 다정의 내부 비즈니스 도구를 표준화된 MCP 도구 형태로 노출합니다. 초기 MVP에서는 공식 MCP SDK를 바로 사용하지 않고 FastAPI 기반 fake MCP HTTP 서버로 시작합니다.
+
+MVP fake MCP 서버는 비즈니스 로직을 직접 구현하지 않고 FastAPI 백엔드 API를 호출하는 얇은 어댑터로 둡니다. Tool 이름과 입출력 구조는 실제 MCP Tool처럼 설계하고, tool 로직은 `mcp-server/app/tools/` 아래에 분리합니다. HTTP 엔드포인트와 tool 실행 계층은 나중에 공식 Python MCP SDK로 교체할 수 있도록 어댑터 경계를 유지합니다.
 
 ### MVP 필수 MCP Tools
 
@@ -543,7 +551,7 @@ MVP에서는 RAG를 구현하지 않습니다. 다만 다음 확장을 고려해
 - `retrieval/` 또는 `knowledge/` 모듈을 Agent 내부에 나중에 추가 가능하게 유지
 - Agent 도구 호출과 지식 검색 호출을 분리
 - 메뉴, 프로모션, 정책 문서는 추후 벡터 DB로 이전 가능하도록 문서 원천을 구분
-- 현재 Agent는 백엔드 API와 정적 시스템 프롬프트만 사용
+- 현재 Agent는 백엔드 API, 더미 DB 기반 사용자 컨텍스트, 정적 시스템 프롬프트만 사용
 
 ## 13. 테스트 계획
 
@@ -584,4 +592,5 @@ MVP에서는 RAG를 구현하지 않습니다. 다만 다음 확장을 고려해
 - 더미 결제 후 포인트와 영수증이 생성됩니다.
 - 관리자 대시보드에서 주문/결제/포인트/영수증 상태가 확인됩니다.
 - Streamlit AI Agent가 로그인 세션을 기반으로 주문을 생성할 수 있습니다.
+- Streamlit AI Agent가 API Key 없이 `StubLLMProvider` demo mode로 주문 흐름을 시연할 수 있습니다.
 - MCP 서버가 최소한 메뉴 조회와 주문 관련 도구를 제공합니다.

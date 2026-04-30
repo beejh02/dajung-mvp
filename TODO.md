@@ -15,9 +15,10 @@
 - [x] 결제 승인 idempotency와 단일 트랜잭션 처리 정책 확정
 - [x] MCP 서버 역할 확정: FastAPI 백엔드 API를 호출하는 얇은 어댑터
 - [x] MVP MCP tool 범위 확정: 메뉴 조회, 주문 제출, 더미 결제 승인, 영수증 조회, 최근 주문 조회
-- [x] AI 모델 클라이언트 전략 확정: provider 추상화 + fake/stub client로 E2E 선구현
-- [ ] `models/gemma-4-26b-a4b-it` 실제 제공자/API/인증 방식 확인
-- [ ] MCP 서버 SDK/런타임 세부 패키지 확정
+- [x] AI 모델 클라이언트 전략 확정: `LLMProvider` 추상화 + `StubLLMProvider`로 E2E 선구현
+- [x] `models/gemma-4-26b-a4b-it`는 목표 모델로 두고, 초기 MVP는 실제 API 연결 없이 Stub provider로 개발
+- [x] 추후 Google Gemini API 또는 Cloudflare Workers AI Provider로 교체 가능한 구조 확정
+- [x] MCP 서버 SDK/런타임 전략 확정: 공식 SDK 미사용, FastAPI 기반 fake MCP HTTP 서버로 시작
 
 ## Phase 1. 프로젝트 스캐폴딩
 
@@ -127,9 +128,12 @@
 - [ ] Streamlit 채팅 UI 작성
 - [ ] 다정 handoff token 수신 처리
 - [ ] Agent 세션 교환 처리
-- [ ] 모델 클라이언트 추상화 작성
-- [ ] fake/stub model client 구현
-- [ ] `models/gemma-4-26b-a4b-it` 연결
+- [ ] `LLMProvider` 인터페이스 작성
+- [ ] `StubLLMProvider` 구현: 사용자 입력 기반 predefined intent JSON 반환
+- [ ] API Key 없이 실행 가능한 demo mode 처리
+- [ ] `models/gemma-4-26b-a4b-it` 목표 모델 식별자 설정값 정의
+- [ ] Google Gemini API Provider 교체 가능 구조 준비
+- [ ] Cloudflare Workers AI Provider 교체 가능 구조 준비
 - [ ] 시스템 프롬프트 작성
 - [ ] 메뉴 조회 도구 구현
 - [ ] 사용자 컨텍스트 조회 도구 구현
@@ -139,20 +143,24 @@
 - [ ] 영수증 조회 도구 구현
 - [ ] 포인트 조회 도구 구현
 - [ ] 결제 전 사용자 확인 흐름 구현
-- [ ] 모델 출력 JSON 검증 실패 시 재질문 흐름 구현
+- [ ] intent JSON 검증 실패 시 재질문 흐름 구현
 - [ ] 비활성 메뉴/옵션 요청 시 대체 메뉴 제안 흐름 구현
 
 ## Phase 9. 기업 MCP 서버
 
-- [ ] MCP 서버 엔트리포인트 작성
+- [ ] FastAPI fake MCP HTTP 서버 엔트리포인트 작성
+- [ ] 공식 MCP SDK 없이 동작하는 tool 호출 HTTP API 작성
 - [ ] FastAPI 백엔드 클라이언트 작성
+- [ ] tool adapter 경계 작성: HTTP 요청/응답과 tool 실행 로직 분리
+- [ ] `mcp-server/app/tools/` 아래에 tool 로직 분리
 - [ ] `dajung.get_menu` tool 구현
 - [ ] `dajung.submit_order` tool 구현
 - [ ] `dajung.approve_dummy_payment` tool 구현
 - [ ] `dajung.get_receipt` tool 구현
 - [ ] `dajung.list_recent_orders` tool 구현
-- [ ] MCP 도구별 입력/출력 스키마 문서화
+- [ ] 실제 MCP Tool형 입력/출력 스키마 문서화
 - [ ] MCP tool 백엔드 API 오류 변환 처리
+- [ ] 추후 공식 Python MCP SDK adapter 전환 지점 문서화
 - [ ] 확장 후보 tool 보류: `dajung.get_user_profile`, `dajung.create_order_draft`, `dajung.get_admin_overview`
 
 ## Phase 10. 통합 검증
@@ -175,7 +183,7 @@
 - [ ] API 명세 업데이트
 - [ ] Agent 도구 명세 업데이트
 - [ ] MCP 서버 사용 방법 업데이트
-- [ ] 알려진 제한사항 정리
+- [ ] demo mode, Stub LLM, fake MCP HTTP 서버 제한사항 정리
 - [ ] 추후 RAG 확장 계획 정리
 - [ ] 음성/STT/TTS 제외 범위 재명시
 - [ ] 데모 시나리오 작성
