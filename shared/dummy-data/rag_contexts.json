@@ -1,0 +1,42 @@
+[
+  {
+    "id": "rag_user_001_preference_001",
+    "user_id": "user_001",
+    "type": "preference",
+    "content": "김다온 데모 사용자는 데리버거 세트를 자주 선택하고, 토마토와 피클을 빼는 편입니다.",
+    "source": "preferences.json",
+    "created_at": "2026-04-20T12:20:00+09:00"
+  },
+  {
+    "id": "rag_user_001_order_001",
+    "user_id": "user_001",
+    "type": "past_order_summary",
+    "content": "최근 다정버거 프리미엄점에서 데리버거 세트, 토마토 제외, 콜라, 감자튀김 조합을 주문했습니다.",
+    "source": "order_history.json",
+    "created_at": "2026-04-20T12:21:00+09:00"
+  },
+  {
+    "id": "rag_user_001_note_001",
+    "user_id": "user_001",
+    "type": "user_note",
+    "content": "점심 시간에는 빠른 재주문을 선호한다는 발표용 컨텍스트입니다.",
+    "source": "demo_note",
+    "created_at": "2026-04-21T09:00:00+09:00"
+  },
+  {
+    "id": "rag_user_002_preference_001",
+    "user_id": "user_002",
+    "type": "preference",
+    "content": "박하린 데모 사용자는 제로콜라와 치즈스틱을 선호하고, 생양파는 피하는 편입니다.",
+    "source": "preferences.json",
+    "created_at": "2026-04-19T13:10:00+09:00"
+  },
+  {
+    "id": "rag_user_002_avoidance_001",
+    "user_id": "user_002",
+    "type": "avoidance",
+    "content": "갑각류 메뉴를 제안할 때는 데모 시나리오상 확인 질문을 먼저 표시합니다.",
+    "source": "demo_note",
+    "created_at": "2026-04-22T10:30:00+09:00"
+  }
+]

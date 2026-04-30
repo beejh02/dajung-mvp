@@ -1,0 +1,20 @@
+[
+  {
+    "id": "brand_classic",
+    "name": "클래식버거",
+    "ui_type": "Classic Grid",
+    "description": "빠른 메뉴 선택과 장바구니 확인에 집중한 기본형 키오스크 브랜드입니다."
+  },
+  {
+    "id": "brand_guided",
+    "name": "가이드버거",
+    "ui_type": "Guided Order",
+    "description": "단계별 추천 흐름으로 주문을 돕는 안내형 키오스크 브랜드입니다."
+  },
+  {
+    "id": "brand_dajung",
+    "name": "다정버거",
+    "ui_type": "Dajung Premium",
+    "description": "실제 백엔드 연동 대상이 되는 고완성도 MVP 대표 브랜드입니다."
+  }
+]

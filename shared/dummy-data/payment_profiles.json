@@ -1,0 +1,23 @@
+[
+  {
+    "id": "pay_user_001_card_001",
+    "user_id": "user_001",
+    "card_name": "다온 데모카드",
+    "masked_number": "0000-****-****-1001",
+    "is_default": true
+  },
+  {
+    "id": "pay_user_001_card_002",
+    "user_id": "user_001",
+    "card_name": "다온 보조카드",
+    "masked_number": "0000-****-****-1101",
+    "is_default": false
+  },
+  {
+    "id": "pay_user_002_card_001",
+    "user_id": "user_002",
+    "card_name": "하린 데모카드",
+    "masked_number": "0000-****-****-1002",
+    "is_default": true
+  }
+]

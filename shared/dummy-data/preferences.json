@@ -1,0 +1,24 @@
+[
+  {
+    "user_id": "user_001",
+    "favorite_menu_ids": [
+      "menu_dajung_teriyaki_set",
+      "menu_classic_double_cheese_set"
+    ],
+    "disliked_ingredients": ["토마토", "피클"],
+    "allergy_notes": "발표용 더미 데이터입니다. 실제 알레르기 정보가 아닙니다.",
+    "preferred_drink": "콜라",
+    "preferred_side": "감자튀김"
+  },
+  {
+    "user_id": "user_002",
+    "favorite_menu_ids": [
+      "menu_dajung_shrimp_set",
+      "menu_guided_light_chicken_set"
+    ],
+    "disliked_ingredients": ["생양파"],
+    "allergy_notes": "갑각류 메뉴는 데모에서 확인 질문을 표시합니다.",
+    "preferred_drink": "제로콜라",
+    "preferred_side": "치즈스틱"
+  }
+]

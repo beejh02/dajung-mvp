@@ -1,0 +1,38 @@
+[
+  {
+    "id": "user_001",
+    "email": "demo.user1@example.test",
+    "password": "demo-user-001!",
+    "name": "김다온",
+    "phone": "000-0000-1001",
+    "role": "user",
+    "age_group": "20s",
+    "location_consent": true,
+    "default_location": "서울 데모구 다정역",
+    "created_at": "2026-04-01T09:00:00+09:00"
+  },
+  {
+    "id": "user_002",
+    "email": "demo.user2@example.test",
+    "password": "demo-user-002!",
+    "name": "박하린",
+    "phone": "000-0000-1002",
+    "role": "user",
+    "age_group": "30s",
+    "location_consent": false,
+    "default_location": "위치 미설정",
+    "created_at": "2026-04-03T14:20:00+09:00"
+  },
+  {
+    "id": "user_admin_001",
+    "email": "admin@example.test",
+    "password": "demo-admin-001!",
+    "name": "다정 관리자",
+    "phone": "000-0000-9001",
+    "role": "admin",
+    "age_group": "staff",
+    "location_consent": false,
+    "default_location": "관리자 콘솔",
+    "created_at": "2026-04-01T08:30:00+09:00"
+  }
+]

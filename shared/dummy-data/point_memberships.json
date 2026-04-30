@@ -1,0 +1,30 @@
+[
+  {
+    "id": "point_user_001_dajung",
+    "user_id": "user_001",
+    "brand_id": "brand_dajung",
+    "phone_last4": "1001",
+    "current_points": 2450
+  },
+  {
+    "id": "point_user_001_classic",
+    "user_id": "user_001",
+    "brand_id": "brand_classic",
+    "phone_last4": "1001",
+    "current_points": 720
+  },
+  {
+    "id": "point_user_002_dajung",
+    "user_id": "user_002",
+    "brand_id": "brand_dajung",
+    "phone_last4": "1002",
+    "current_points": 1180
+  },
+  {
+    "id": "point_user_002_guided",
+    "user_id": "user_002",
+    "brand_id": "brand_guided",
+    "phone_last4": "1002",
+    "current_points": 530
+  }
+]

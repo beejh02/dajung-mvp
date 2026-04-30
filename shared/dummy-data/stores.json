@@ -1,0 +1,38 @@
+[
+  {
+    "id": "store_classic_001",
+    "brand_id": "brand_classic",
+    "name": "클래식버거 데모역점",
+    "address": "서울 데모구 클래식로 10",
+    "lat": 37.5011,
+    "lng": 127.0396,
+    "is_open": true
+  },
+  {
+    "id": "store_guided_001",
+    "brand_id": "brand_guided",
+    "name": "가이드버거 샘플몰점",
+    "address": "서울 데모구 가이드길 22",
+    "lat": 37.5043,
+    "lng": 127.0412,
+    "is_open": true
+  },
+  {
+    "id": "store_dajung_001",
+    "brand_id": "brand_dajung",
+    "name": "다정버거 프리미엄점",
+    "address": "서울 데모구 다정로 1",
+    "lat": 37.5079,
+    "lng": 127.0438,
+    "is_open": true
+  },
+  {
+    "id": "store_dajung_002",
+    "brand_id": "brand_dajung",
+    "name": "다정버거 리뉴얼점",
+    "address": "서울 데모구 리뉴얼길 5",
+    "lat": 37.5094,
+    "lng": 127.0471,
+    "is_open": false
+  }
+]

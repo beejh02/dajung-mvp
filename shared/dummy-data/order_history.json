@@ -1,0 +1,101 @@
+[
+  {
+    "id": "order_hist_001",
+    "user_id": "user_001",
+    "store_id": "store_dajung_001",
+    "brand_id": "brand_dajung",
+    "items": [
+      {
+        "menu_id": "menu_dajung_teriyaki_set",
+        "name": "데리버거 세트",
+        "quantity": 1,
+        "selected_options": [
+          {
+            "group_id": "og_dajung_teriyaki_remove_ingredients",
+            "option_id": "opt_dajung_teriyaki_no_tomato",
+            "name": "토마토 제외",
+            "price_delta": 0
+          },
+          {
+            "group_id": "og_dajung_teriyaki_drink",
+            "option_id": "opt_dajung_teriyaki_drink_cola",
+            "name": "콜라",
+            "price_delta": 0
+          },
+          {
+            "group_id": "og_dajung_teriyaki_side",
+            "option_id": "opt_dajung_teriyaki_side_fries",
+            "name": "감자튀김",
+            "price_delta": 0
+          }
+        ],
+        "line_total": 7900
+      }
+    ],
+    "total_price": 7900,
+    "ordered_at": "2026-04-20T12:15:00+09:00",
+    "source": "kiosk"
+  },
+  {
+    "id": "order_hist_002",
+    "user_id": "user_001",
+    "store_id": "store_classic_001",
+    "brand_id": "brand_classic",
+    "items": [
+      {
+        "menu_id": "menu_classic_double_cheese_set",
+        "name": "더블치즈버거 세트",
+        "quantity": 1,
+        "selected_options": [
+          {
+            "group_id": "og_classic_double_cheese_drink",
+            "option_id": "opt_classic_drink_zero_cola",
+            "name": "제로콜라",
+            "price_delta": 0
+          },
+          {
+            "group_id": "og_classic_double_cheese_side",
+            "option_id": "opt_classic_side_nuggets",
+            "name": "너겟",
+            "price_delta": 700
+          }
+        ],
+        "line_total": 9600
+      }
+    ],
+    "total_price": 9600,
+    "ordered_at": "2026-04-18T18:40:00+09:00",
+    "source": "ai_agent"
+  },
+  {
+    "id": "order_hist_003",
+    "user_id": "user_002",
+    "store_id": "store_dajung_001",
+    "brand_id": "brand_dajung",
+    "items": [
+      {
+        "menu_id": "menu_dajung_shrimp_set",
+        "name": "새우버거 세트",
+        "quantity": 1,
+        "selected_options": [
+          {
+            "group_id": "og_dajung_shrimp_drink",
+            "option_id": "opt_dajung_shrimp_drink_zero_cola",
+            "name": "제로콜라",
+            "price_delta": 0
+          },
+          {
+            "group_id": "og_dajung_shrimp_side",
+            "option_id": "opt_dajung_shrimp_side_cheese_sticks",
+            "name": "치즈스틱",
+            "price_delta": 800
+          }
+        ],
+        "line_total": 9400
+      }
+    ],
+    "total_price": 9400,
+    "ordered_at": "2026-04-19T13:05:00+09:00",
+    "source": "kiosk"
+  }
+]

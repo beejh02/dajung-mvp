@@ -1,0 +1,383 @@
+[
+  {
+    "id": "menu_classic_double_cheese_set",
+    "brand_id": "brand_classic",
+    "name": "더블치즈버거 세트",
+    "category": "set",
+    "base_price": 8900,
+    "description": "두 장의 패티와 체다 치즈를 담은 클래식 세트입니다.",
+    "ingredients": ["번", "소고기 패티", "체다 치즈", "양상추", "피클", "스페셜 소스"],
+    "is_available": true,
+    "option_groups": [
+      {
+        "group_id": "og_classic_double_cheese_drink",
+        "name": "음료 선택",
+        "required": true,
+        "min_select": 1,
+        "max_select": 1,
+        "options": [
+          {
+            "option_id": "opt_classic_drink_cola",
+            "name": "콜라",
+            "price_delta": 0,
+            "is_available": true
+          },
+          {
+            "option_id": "opt_classic_drink_zero_cola",
+            "name": "제로콜라",
+            "price_delta": 0,
+            "is_available": true
+          }
+        ]
+      },
+      {
+        "group_id": "og_classic_double_cheese_side",
+        "name": "사이드 선택",
+        "required": true,
+        "min_select": 1,
+        "max_select": 1,
+        "options": [
+          {
+            "option_id": "opt_classic_side_fries",
+            "name": "감자튀김",
+            "price_delta": 0,
+            "is_available": true
+          },
+          {
+            "option_id": "opt_classic_side_nuggets",
+            "name": "너겟",
+            "price_delta": 700,
+            "is_available": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "menu_classic_bulgogi_burger",
+    "brand_id": "brand_classic",
+    "name": "불고기버거",
+    "category": "burger",
+    "base_price": 5200,
+    "description": "달콤한 불고기 소스를 사용한 단품 버거입니다.",
+    "ingredients": ["번", "돼지고기 패티", "양상추", "불고기 소스", "마요 소스"],
+    "is_available": true,
+    "option_groups": [
+      {
+        "group_id": "og_classic_bulgogi_add",
+        "name": "추가 선택",
+        "required": false,
+        "min_select": 0,
+        "max_select": 2,
+        "options": [
+          {
+            "option_id": "opt_classic_add_cheese",
+            "name": "치즈 추가",
+            "price_delta": 500,
+            "is_available": true
+          },
+          {
+            "option_id": "opt_classic_add_patty",
+            "name": "패티 추가",
+            "price_delta": 1500,
+            "is_available": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "menu_guided_beginner_set",
+    "brand_id": "brand_guided",
+    "name": "처음 주문 세트",
+    "category": "set",
+    "base_price": 8200,
+    "description": "처음 방문한 사용자를 위한 기본 추천 세트입니다.",
+    "ingredients": ["번", "소고기 패티", "양상추", "토마토", "피클", "하우스 소스"],
+    "is_available": true,
+    "option_groups": [
+      {
+        "group_id": "og_guided_beginner_drink",
+        "name": "음료 선택",
+        "required": true,
+        "min_select": 1,
+        "max_select": 1,
+        "options": [
+          {
+            "option_id": "opt_guided_beginner_drink_cola",
+            "name": "콜라",
+            "price_delta": 0,
+            "is_available": true
+          },
+          {
+            "option_id": "opt_guided_beginner_drink_ade",
+            "name": "레몬에이드",
+            "price_delta": 600,
+            "is_available": true
+          }
+        ]
+      },
+      {
+        "group_id": "og_guided_beginner_side",
+        "name": "사이드 선택",
+        "required": true,
+        "min_select": 1,
+        "max_select": 1,
+        "options": [
+          {
+            "option_id": "opt_guided_beginner_side_fries",
+            "name": "감자튀김",
+            "price_delta": 0,
+            "is_available": true
+          },
+          {
+            "option_id": "opt_guided_beginner_side_salad",
+            "name": "미니 샐러드",
+            "price_delta": 900,
+            "is_available": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "menu_guided_light_chicken_set",
+    "brand_id": "brand_guided",
+    "name": "라이트 치킨 세트",
+    "category": "set",
+    "base_price": 8700,
+    "description": "닭가슴살 패티와 가벼운 사이드를 조합한 추천 세트입니다.",
+    "ingredients": ["번", "치킨 패티", "양상추", "토마토", "요거트 소스"],
+    "is_available": true,
+    "option_groups": [
+      {
+        "group_id": "og_guided_light_drink",
+        "name": "음료 선택",
+        "required": true,
+        "min_select": 1,
+        "max_select": 1,
+        "options": [
+          {
+            "option_id": "opt_guided_light_drink_zero_cola",
+            "name": "제로콜라",
+            "price_delta": 0,
+            "is_available": true
+          },
+          {
+            "option_id": "opt_guided_light_drink_sparkling_water",
+            "name": "탄산수",
+            "price_delta": 300,
+            "is_available": true
+          }
+        ]
+      },
+      {
+        "group_id": "og_guided_light_side",
+        "name": "사이드 선택",
+        "required": true,
+        "min_select": 1,
+        "max_select": 1,
+        "options": [
+          {
+            "option_id": "opt_guided_light_side_salad",
+            "name": "미니 샐러드",
+            "price_delta": 0,
+            "is_available": true
+          },
+          {
+            "option_id": "opt_guided_light_side_fries_small",
+            "name": "작은 감자튀김",
+            "price_delta": 300,
+            "is_available": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "menu_dajung_teriyaki_set",
+    "brand_id": "brand_dajung",
+    "name": "데리버거 세트",
+    "category": "set",
+    "base_price": 7900,
+    "description": "달콤한 데리야키 소스와 기본 사이드 구성이 포함된 다정버거 대표 세트입니다.",
+    "ingredients": ["번", "소고기 패티", "양상추", "토마토", "피클", "데리야키 소스"],
+    "is_available": true,
+    "option_groups": [
+      {
+        "group_id": "og_dajung_teriyaki_remove_ingredients",
+        "name": "빼기 선택",
+        "required": false,
+        "min_select": 0,
+        "max_select": 3,
+        "options": [
+          {
+            "option_id": "opt_dajung_teriyaki_no_tomato",
+            "name": "토마토 제외",
+            "price_delta": 0,
+            "is_available": true
+          },
+          {
+            "option_id": "opt_dajung_teriyaki_no_pickle",
+            "name": "피클 제외",
+            "price_delta": 0,
+            "is_available": true
+          },
+          {
+            "option_id": "opt_dajung_teriyaki_no_onion",
+            "name": "양파 제외",
+            "price_delta": 0,
+            "is_available": true
+          }
+        ]
+      },
+      {
+        "group_id": "og_dajung_teriyaki_drink",
+        "name": "음료 선택",
+        "required": true,
+        "min_select": 1,
+        "max_select": 1,
+        "options": [
+          {
+            "option_id": "opt_dajung_teriyaki_drink_cola",
+            "name": "콜라",
+            "price_delta": 0,
+            "is_available": true
+          },
+          {
+            "option_id": "opt_dajung_teriyaki_drink_zero_cola",
+            "name": "제로콜라",
+            "price_delta": 0,
+            "is_available": true
+          },
+          {
+            "option_id": "opt_dajung_teriyaki_drink_cider",
+            "name": "사이다",
+            "price_delta": 0,
+            "is_available": true
+          },
+          {
+            "option_id": "opt_dajung_teriyaki_drink_iced_tea",
+            "name": "아이스티",
+            "price_delta": 500,
+            "is_available": true
+          }
+        ]
+      },
+      {
+        "group_id": "og_dajung_teriyaki_side",
+        "name": "사이드 선택",
+        "required": true,
+        "min_select": 1,
+        "max_select": 1,
+        "options": [
+          {
+            "option_id": "opt_dajung_teriyaki_side_fries",
+            "name": "감자튀김",
+            "price_delta": 0,
+            "is_available": true
+          },
+          {
+            "option_id": "opt_dajung_teriyaki_side_cheese_sticks",
+            "name": "치즈스틱",
+            "price_delta": 800,
+            "is_available": true
+          },
+          {
+            "option_id": "opt_dajung_teriyaki_side_onion_rings",
+            "name": "어니언링",
+            "price_delta": 1000,
+            "is_available": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "menu_dajung_signature_burger",
+    "brand_id": "brand_dajung",
+    "name": "다정 시그니처 버거",
+    "category": "burger",
+    "base_price": 6900,
+    "description": "구운 양파와 시그니처 소스를 더한 단품 버거입니다.",
+    "ingredients": ["브리오슈 번", "소고기 패티", "구운 양파", "양상추", "시그니처 소스"],
+    "is_available": true,
+    "option_groups": [
+      {
+        "group_id": "og_dajung_signature_add",
+        "name": "추가 선택",
+        "required": false,
+        "min_select": 0,
+        "max_select": 2,
+        "options": [
+          {
+            "option_id": "opt_dajung_signature_add_cheese",
+            "name": "치즈 추가",
+            "price_delta": 500,
+            "is_available": true
+          },
+          {
+            "option_id": "opt_dajung_signature_add_patty",
+            "name": "패티 추가",
+            "price_delta": 1800,
+            "is_available": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "menu_dajung_shrimp_set",
+    "brand_id": "brand_dajung",
+    "name": "새우버거 세트",
+    "category": "set",
+    "base_price": 8600,
+    "description": "새우 패티와 산뜻한 타르타르 소스를 조합한 세트입니다.",
+    "ingredients": ["번", "새우 패티", "양상추", "피클", "타르타르 소스"],
+    "is_available": true,
+    "option_groups": [
+      {
+        "group_id": "og_dajung_shrimp_drink",
+        "name": "음료 선택",
+        "required": true,
+        "min_select": 1,
+        "max_select": 1,
+        "options": [
+          {
+            "option_id": "opt_dajung_shrimp_drink_cola",
+            "name": "콜라",
+            "price_delta": 0,
+            "is_available": true
+          },
+          {
+            "option_id": "opt_dajung_shrimp_drink_zero_cola",
+            "name": "제로콜라",
+            "price_delta": 0,
+            "is_available": true
+          }
+        ]
+      },
+      {
+        "group_id": "og_dajung_shrimp_side",
+        "name": "사이드 선택",
+        "required": true,
+        "min_select": 1,
+        "max_select": 1,
+        "options": [
+          {
+            "option_id": "opt_dajung_shrimp_side_fries",
+            "name": "감자튀김",
+            "price_delta": 0,
+            "is_available": true
+          },
+          {
+            "option_id": "opt_dajung_shrimp_side_cheese_sticks",
+            "name": "치즈스틱",
+            "price_delta": 800,
+            "is_available": true
+          }
+        ]
+      }
+    ]
+  }
+]
