@@ -2,7 +2,7 @@
 
 다정 MVP는 햄버거 키오스크 주문 경험을 여러 UI 방향으로 검증하고, 하나의 고완성도 UI를 실제 백엔드와 연결한 뒤, 로그인된 사용자가 텍스트 채팅형 AI Agent로도 주문할 수 있게 만드는 프로토타입입니다.
 
-이번 단계에서는 코드 구현을 시작하지 않습니다. 이 문서는 전체 구조, 확정된 기술 선택, 개발 순서를 합의하기 위한 기준 문서입니다.
+Phase 1부터는 최소 실행 가능한 프로젝트 스캐폴딩을 시작합니다. 이 문서는 전체 구조, 확정된 기술 선택, 개발 순서를 합의하기 위한 기준 문서입니다.
 
 ## MVP 목표
 
@@ -39,9 +39,60 @@
 - AI Model: `models/gemma-4-26b-a4b-it`
 - MCP Server: Python 기반 MCP 서버
 
+## 로컬 실행 방법
+
+Phase 1은 최소 실행 가능한 스캐폴딩만 포함합니다. 주문, 결제, 포인트, MCP tool, AI 채팅 로직은 아직 구현하지 않습니다.
+
+### 키오스크 프론트엔드
+
+```powershell
+cd frontend/kiosk
+pnpm install
+pnpm dev --host 127.0.0.1 --port 5173
+```
+
+### 관리자 프론트엔드
+
+```powershell
+cd frontend/admin
+pnpm install
+pnpm dev --host 127.0.0.1 --port 5174
+```
+
+### 백엔드 API
+
+```powershell
+cd backend/app
+uv venv
+uv pip install -r requirements.txt
+.venv\Scripts\uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+헬스체크: `GET http://127.0.0.1:8000/health`
+
+### AI Agent
+
+```powershell
+cd ai-agent/app
+uv venv
+uv pip install -r requirements.txt
+.venv\Scripts\streamlit run app.py
+```
+
+### Fake MCP HTTP 서버
+
+```powershell
+cd mcp-server/app
+uv venv
+uv pip install -r requirements.txt
+.venv\Scripts\uvicorn app.main:app --reload --host 127.0.0.1 --port 8010
+```
+
+헬스체크: `GET http://127.0.0.1:8010/health`
+
 ## 계획된 프로젝트 구조
 
-아래 구조는 계획안이며, 이번 문서 작성 단계에서는 실제 폴더를 생성하지 않습니다.
+아래 구조는 Phase 1에서 생성한 초기 구조이며, 세부 기능 코드는 이후 단계에서 추가합니다.
 
 ```text
 dajung-mvp/

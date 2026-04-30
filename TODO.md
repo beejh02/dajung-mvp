@@ -22,17 +22,17 @@
 
 ## Phase 1. 프로젝트 스캐폴딩
 
-- [ ] 루트 폴더 구조 생성
-- [ ] `frontend/kiosk` React + TypeScript + Vite 초기화
-- [ ] `frontend/admin` React + TypeScript + Vite 초기화
-- [ ] `backend/app` FastAPI 앱 초기화
-- [ ] `ai-agent/app` Streamlit 앱 초기화
-- [ ] `mcp-server/app` MCP 서버 초기화
-- [ ] `shared/frontend-client` 공통 프론트 API 클라이언트 영역 생성
-- [ ] `shared/dummy-data` 더미 데이터 영역 생성
-- [ ] `shared/docs` 설계 문서 영역 생성
-- [ ] 공통 환경 변수 예시 파일 작성
-- [ ] 로컬 실행 방법 문서화
+- [x] 루트 폴더 구조 생성
+- [x] `frontend/kiosk` React + TypeScript + Vite 초기화
+- [x] `frontend/admin` React + TypeScript + Vite 초기화
+- [x] `backend/app` FastAPI 앱 초기화
+- [x] `ai-agent/app` Streamlit 앱 초기화
+- [x] `mcp-server/app` MCP 서버 초기화
+- [x] `shared/frontend-client` 공통 프론트 API 클라이언트 영역 생성
+- [x] `shared/dummy-data` 더미 데이터 영역 생성
+- [x] `shared/docs` 설계 문서 영역 생성
+- [x] 공통 환경 변수 예시 파일 작성
+- [x] 로컬 실행 방법 문서화
 
 ## Phase 2. 백엔드 기반 구현
 
