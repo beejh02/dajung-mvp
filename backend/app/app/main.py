@@ -5,6 +5,7 @@ from fastapi import FastAPI
 
 from app.core.config import get_settings
 from app.db.session import init_db
+from app.routers.auth import router as auth_router
 from app.routers.health import router as health_router
 
 
@@ -22,6 +23,7 @@ def create_app() -> FastAPI:
         version=settings.app_version,
         lifespan=lifespan,
     )
+    app.include_router(auth_router)
     app.include_router(health_router)
     return app
 

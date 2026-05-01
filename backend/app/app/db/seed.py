@@ -1,4 +1,3 @@
-import hashlib
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -7,6 +6,7 @@ from typing import Any
 from sqlmodel import Session, select
 
 from app.core.config import get_settings
+from app.core.security import hash_password
 from app.models import MenuItem, User
 from app.models.enums import UserRole
 
@@ -23,8 +23,7 @@ def _parse_datetime(value: str | None) -> datetime:
 
 
 def _hash_seed_password(password: str) -> str:
-    digest = hashlib.sha256(password.encode("utf-8")).hexdigest()
-    return f"seed-sha256:{digest}"
+    return hash_password(password, get_settings())
 
 
 def _normalize_option_groups(option_groups: list[dict[str, Any]]) -> list[dict[str, Any]]:

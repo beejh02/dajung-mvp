@@ -54,17 +54,17 @@
 
 ## Phase 3. 인증 및 사용자
 
-- [ ] 회원가입 API 구현
-- [ ] 로그인 API 구현
-- [ ] 현재 사용자 조회 API 구현
-- [ ] 비밀번호 해시 처리
-- [ ] JWT 액세스 토큰 발급
-- [ ] 관리자 API 보호용 `role=admin` dependency 구현
-- [ ] React/Agent 공통 인증 정책 정리
-- [ ] AI 채팅 진입용 3분 만료 handoff token API 구현
-- [ ] handoff token 해시 저장 구현
-- [ ] handoff token 1회 사용 처리 구현
-- [ ] Agent 세션 교환 API 구현: 유효 token을 Agent용 JWT로 교환
+- [x] 회원가입 API 구현
+- [x] 로그인 API 구현
+- [x] 현재 사용자 조회 API 구현
+- [x] 비밀번호 해시 처리
+- [x] JWT 액세스 토큰 발급
+- [x] 관리자 API 보호용 `role=admin` dependency 구현
+- [x] React/Agent 공통 인증 정책 정리
+- [x] AI 채팅 진입용 3분 만료 handoff token API 구현
+- [x] handoff token 해시 저장 구현
+- [x] handoff token 1회 사용 처리 구현
+- [x] Agent 세션 교환 API 구현: 유효 token을 Agent용 JWT로 교환
 
 ## Phase 4. 메뉴, 주문, 결제, 포인트, 영수증
 

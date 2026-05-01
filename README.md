@@ -64,7 +64,7 @@ pnpm dev --host 127.0.0.1 --port 5174
 ```powershell
 cd backend/app
 uv venv
-uv pip install -r requirements.txt
+uv pip install --python .venv\Scripts\python.exe -r requirements.txt
 .venv\Scripts\uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
@@ -75,7 +75,7 @@ uv pip install -r requirements.txt
 ```powershell
 cd ai-agent/app
 uv venv
-uv pip install -r requirements.txt
+uv pip install --python .venv\Scripts\python.exe -r requirements.txt
 .venv\Scripts\streamlit run app.py
 ```
 
@@ -84,7 +84,7 @@ uv pip install -r requirements.txt
 ```powershell
 cd mcp-server/app
 uv venv
-uv pip install -r requirements.txt
+uv pip install --python .venv\Scripts\python.exe -r requirements.txt
 .venv\Scripts\uvicorn app.main:app --reload --host 127.0.0.1 --port 8010
 ```
 

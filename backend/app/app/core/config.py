@@ -28,6 +28,12 @@ class Settings(BaseModel):
     database_echo: bool = _env_bool("DATABASE_ECHO", False)
     seed_on_startup: bool = _env_bool("SEED_ON_STARTUP", True)
     seed_data_dir: Path = Path(os.getenv("SEED_DATA_DIR", str(_default_seed_data_dir())))
+    jwt_secret_key: str = os.getenv("JWT_SECRET_KEY", "change-me-in-local-development")
+    jwt_algorithm: str = os.getenv("JWT_ALGORITHM", "HS256")
+    access_token_expire_minutes: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60"))
+    agent_access_token_expire_minutes: int = int(os.getenv("AGENT_ACCESS_TOKEN_EXPIRE_MINUTES", "60"))
+    handoff_token_expire_minutes: int = int(os.getenv("HANDOFF_TOKEN_EXPIRE_MINUTES", "3"))
+    password_hash_iterations: int = int(os.getenv("PASSWORD_HASH_ITERATIONS", "210000"))
 
 
 @lru_cache
