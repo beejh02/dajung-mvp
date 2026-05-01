@@ -87,14 +87,14 @@
 
 ## Phase 5. React 웹 앱
 
-- [ ] React 라우팅 구조 작성
-- [ ] `shared/frontend-client` 기반 API 클라이언트 작성
-- [ ] `frontend/kiosk`와 `frontend/admin`의 앱별 API 래퍼 작성
-- [ ] 로그인 화면 구현
-- [ ] 회원가입 화면 구현
-- [ ] 로그인 세션 저장/복원 처리
-- [ ] 공통 레이아웃 작성
-- [ ] 메뉴/가격 포맷 유틸 작성
+- [x] React 라우팅 구조 작성
+- [x] `shared/frontend-client` 기반 API 클라이언트 작성
+- [x] `frontend/kiosk`와 `frontend/admin`의 앱별 API 래퍼 작성
+- [x] 로그인 화면 구현
+- [x] 회원가입 화면 구현
+- [x] 로그인 세션 저장/복원 처리
+- [x] 공통 레이아웃 작성
+- [x] 메뉴/가격 포맷 유틸 작성
 
 ## Phase 6. 키오스크 UI 3종
 
