@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.models.enums import OrderSource, OrderStatus
 
@@ -20,9 +20,16 @@ class OrderCreateItem(BaseModel):
 class OrderCreateRequest(BaseModel):
     source: OrderSource
     items: list[OrderCreateItem] = Field(min_length=1)
+    simulate_failure: bool = False
+
+
+class OrderStatusUpdateRequest(BaseModel):
+    status: OrderStatus
 
 
 class OrderItemRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     menu_item_id: str
     name_snapshot: str
@@ -33,6 +40,8 @@ class OrderItemRead(BaseModel):
 
 
 class OrderRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     user_id: str
     source: OrderSource

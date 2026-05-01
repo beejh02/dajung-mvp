@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class MenuOptionChoice(BaseModel):
@@ -18,6 +18,8 @@ class MenuOptionGroup(BaseModel):
 
 
 class MenuItemRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: str
     brand_id: str | None = None
     name: str
