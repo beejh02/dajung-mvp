@@ -36,21 +36,21 @@
 
 ## Phase 2. 백엔드 기반 구현
 
-- [ ] FastAPI 앱 엔트리포인트 작성
-- [ ] 설정 모듈 작성
-- [ ] SQLite 연결 구성
-- [ ] DB 모델 정의
-- [ ] `OrderStatus`, `PaymentStatus`, `OrderSource`, `PointLedgerType` enum 정의
-- [ ] 사용자 `role` 필드와 관리자 권한 모델 정의
-- [ ] handoff token 저장 모델 정의: token hash, 만료, 사용 시각
-- [ ] 결제/영수증/포인트 중복 방지 유니크 제약 정의
-- [ ] Pydantic 요청/응답 스키마 정의
-- [ ] 메뉴 옵션 그룹 스키마 정의: required, min_select, max_select, price_delta, is_available
-- [ ] 더미 seed 데이터 구조 작성
-- [ ] 메뉴 seed 데이터 작성
-- [ ] 더미 사용자 seed 데이터 작성
-- [ ] 관리자 seed 사용자 작성
-- [ ] 기본 헬스체크 API 작성
+- [x] FastAPI 앱 엔트리포인트 작성
+- [x] 설정 모듈 작성
+- [x] SQLite 연결 구성
+- [x] DB 모델 정의
+- [x] `OrderStatus`, `PaymentStatus`, `OrderSource`, `PointLedgerType` enum 정의
+- [x] 사용자 `role` 필드와 관리자 권한 모델 정의
+- [x] handoff token 저장 모델 정의: token hash, 만료, 사용 시각
+- [x] 결제/영수증/포인트 중복 방지 유니크 제약 정의
+- [x] Pydantic 요청/응답 스키마 정의
+- [x] 메뉴 옵션 그룹 스키마 정의: required, min_select, max_select, price_delta, is_available
+- [x] 더미 seed 데이터 구조 작성
+- [x] 메뉴 seed 데이터 작성
+- [x] 더미 사용자 seed 데이터 작성
+- [x] 관리자 seed 사용자 작성
+- [x] 기본 헬스체크 API 작성
 
 ## Phase 3. 인증 및 사용자
 
