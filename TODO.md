@@ -98,17 +98,17 @@
 
 ## Phase 6. 키오스크 UI 3종
 
-- [ ] `Classic Grid` 키오스크 UI 구현
-- [ ] `Guided Order` 키오스크 UI 구현
-- [ ] `Dajung Premium` 키오스크 UI 구현
-- [ ] 3종 UI 전환 화면 또는 라우트 구현
-- [ ] 비연동 UI용 mock 데이터 연결
-- [ ] `Dajung Premium`에 실제 메뉴 API 연결
-- [ ] `Dajung Premium`에서 서버 계산 금액을 기준으로 주문 확인 UI 표시
-- [ ] `Dajung Premium` 주문 생성 연동
-- [ ] `Dajung Premium` 더미 결제 연동
-- [ ] `Dajung Premium` 포인트/영수증 결과 화면 구현
-- [ ] 모바일/태블릿/키오스크 크기 반응형 확인
+- [x] `Classic Grid` 키오스크 UI 구현
+- [x] `Guided Order` 키오스크 UI 구현
+- [x] `Dajung Premium` 키오스크 UI 구현
+- [x] 3종 UI 전환 화면 또는 라우트 구현
+- [x] 비연동 UI용 mock 데이터 연결
+- [x] `Dajung Premium`에 실제 메뉴 API 연결
+- [x] `Dajung Premium`에서 서버 계산 금액을 기준으로 주문 확인 UI 표시
+- [x] `Dajung Premium` 주문 생성 연동
+- [x] `Dajung Premium` 더미 결제 연동
+- [x] `Dajung Premium` 포인트/영수증 결과 화면 구현
+- [x] 모바일/태블릿/키오스크 크기 반응형 확인
 
 ## Phase 7. 관리자 대시보드
 

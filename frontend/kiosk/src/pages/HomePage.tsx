@@ -9,13 +9,34 @@ interface HomePageProps {
 }
 
 export function HomePage({ session, sessionError, onNavigate }: HomePageProps) {
+  const kioskModes = [
+    {
+      route: "/kiosk/classic-grid" as const,
+      title: "Classic Grid",
+      label: "Mock",
+      description: "Category tabs, menu grid, and a cart-first checkout layout.",
+    },
+    {
+      route: "/kiosk/guided-order" as const,
+      title: "Guided Order",
+      label: "Mock",
+      description: "Step-by-step selection for first-time or slower decision flows.",
+    },
+    {
+      route: "/kiosk/dajung-premium" as const,
+      title: "Dajung Premium",
+      label: "Live API",
+      description: "Backend menu, server order, dummy payment, points, and receipt.",
+    },
+  ];
+
   return (
-    <section className="content-grid">
+    <section className="home-stack">
       <div className="intro-panel">
         <p className="eyebrow">Account entry</p>
         <h1>Dajung Kiosk</h1>
         <p className="lead">
-          Sign in once and keep the same account context for the kiosk order flow.
+          Compare three kiosk directions. The Premium flow uses the live backend order pipeline.
         </p>
         <div className="button-row">
           {session ? (
@@ -31,6 +52,21 @@ export function HomePage({ session, sessionError, onNavigate }: HomePageProps) {
             </>
           )}
         </div>
+      </div>
+
+      <div className="mode-grid" aria-label="Kiosk modes">
+        {kioskModes.map((mode) => (
+          <article className="mode-card" key={mode.route}>
+            <div>
+              <span>{mode.label}</span>
+              <h2>{mode.title}</h2>
+              <p>{mode.description}</p>
+            </div>
+            <button className="secondary-action" type="button" onClick={() => onNavigate(mode.route)}>
+              Open
+            </button>
+          </article>
+        ))}
       </div>
 
       <aside className="status-panel" aria-label="Account status">

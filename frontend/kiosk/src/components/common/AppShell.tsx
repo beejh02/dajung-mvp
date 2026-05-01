@@ -39,6 +39,30 @@ export function AppShell({
           >
             Home
           </button>
+          <button
+            className="nav-link"
+            type="button"
+            aria-current={currentRoute === "/kiosk/classic-grid" ? "page" : undefined}
+            onClick={() => onNavigate("/kiosk/classic-grid")}
+          >
+            Classic
+          </button>
+          <button
+            className="nav-link"
+            type="button"
+            aria-current={currentRoute === "/kiosk/guided-order" ? "page" : undefined}
+            onClick={() => onNavigate("/kiosk/guided-order")}
+          >
+            Guided
+          </button>
+          <button
+            className="nav-link"
+            type="button"
+            aria-current={currentRoute === "/kiosk/dajung-premium" ? "page" : undefined}
+            onClick={() => onNavigate("/kiosk/dajung-premium")}
+          >
+            Premium
+          </button>
           {session ? (
             <button className="nav-link" type="button" onClick={onSignOut}>
               Sign out

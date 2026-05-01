@@ -1,6 +1,6 @@
 :root {
   color: #1d1d1f;
-  background: #f6f1e9;
+  background: #f4f5f2;
   font-family:
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
@@ -140,7 +140,7 @@ button {
 
 .main-surface {
   margin: 0 auto;
-  max-width: 1080px;
+  max-width: 1280px;
   padding: clamp(24px, 6vw, 56px) clamp(16px, 4vw, 40px);
 }
 
@@ -165,7 +165,7 @@ button {
 }
 
 .intro-panel {
-  min-height: 360px;
+  min-height: 320px;
 }
 
 .eyebrow {
@@ -283,6 +283,433 @@ h1 {
   outline: 3px solid #cbe5df;
 }
 
+.home-stack {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+}
+
+.home-stack .intro-panel {
+  min-height: 280px;
+}
+
+.home-stack .status-panel {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+}
+
+.mode-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.mode-card {
+  align-content: space-between;
+  background: #ffffff;
+  border: 1px solid #e2d9ce;
+  border-radius: 8px;
+  display: grid;
+  gap: 22px;
+  min-height: 230px;
+  padding: 22px;
+}
+
+.mode-card span,
+.menu-category,
+.cart-line span,
+.summary-stack span,
+.receipt-lines span,
+.panel-heading span,
+.option-group span,
+.premium-line small {
+  color: #6a6259;
+  font-size: 13px;
+}
+
+.mode-card h2,
+.menu-card h2 {
+  font-size: 22px;
+  line-height: 1.2;
+  margin: 8px 0 10px;
+}
+
+.mode-card p,
+.menu-card p {
+  color: #5a5148;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.kiosk-workspace {
+  display: grid;
+  gap: 22px;
+}
+
+.kiosk-header {
+  align-items: end;
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+}
+
+.kiosk-header h1 {
+  font-size: clamp(34px, 5vw, 52px);
+}
+
+.premium-header .lead {
+  max-width: 760px;
+}
+
+.mock-badge,
+.live-badge {
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 850;
+  min-width: 112px;
+  padding: 12px 14px;
+  text-align: center;
+}
+
+.mock-badge {
+  background: #fff8db;
+  border: 1px solid #dcc86d;
+  color: #6b5512;
+}
+
+.live-badge {
+  background: #e7f6f1;
+  border: 1px solid #8cc8b7;
+  color: #174f48;
+}
+
+.classic-layout,
+.guided-layout,
+.premium-layout {
+  align-items: start;
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+}
+
+.premium-layout {
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 420px);
+}
+
+.order-surface,
+.checkout-panel,
+.configurator-panel {
+  background: #ffffff;
+  border: 1px solid #e2d9ce;
+  border-radius: 8px;
+}
+
+.order-surface {
+  display: grid;
+  gap: 18px;
+  padding: clamp(16px, 3vw, 24px);
+}
+
+.checkout-panel {
+  display: grid;
+  gap: 18px;
+  padding: 20px;
+  position: sticky;
+  top: 18px;
+}
+
+.segmented-control,
+.guided-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.segment-button,
+.step-button,
+.compact-action,
+.option-pill,
+.quantity-control button {
+  border-radius: 8px;
+  min-height: 40px;
+}
+
+.segment-button,
+.step-button,
+.option-pill {
+  background: #f9f7f2;
+  border: 1px solid #d8cec2;
+  color: #403830;
+  font-weight: 750;
+  padding: 0 14px;
+}
+
+.segment-button[aria-pressed="true"],
+.step-button[aria-current="step"],
+.option-pill[aria-pressed="true"] {
+  background: #173f3a;
+  border-color: #173f3a;
+  color: #ffffff;
+}
+
+.step-button {
+  align-items: center;
+  display: inline-flex;
+  gap: 8px;
+}
+
+.step-button span {
+  align-items: center;
+  background: #ffffff;
+  border-radius: 999px;
+  color: #173f3a;
+  display: inline-flex;
+  font-size: 12px;
+  height: 22px;
+  justify-content: center;
+  width: 22px;
+}
+
+.menu-grid,
+.choice-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.premium-menu-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.menu-card {
+  background: #fffdfa;
+  border: 1px solid #e1d8ce;
+  border-radius: 8px;
+  display: grid;
+  grid-template-rows: 120px minmax(0, 1fr);
+  min-height: 330px;
+  overflow: hidden;
+}
+
+.menu-visual {
+  align-items: end;
+  background: #b43b2f;
+  color: #ffffff;
+  display: flex;
+  font-size: 24px;
+  font-weight: 900;
+  padding: 16px;
+}
+
+.menu-visual.live {
+  background: #1b5e57;
+}
+
+.menu-card-body {
+  display: grid;
+  gap: 10px;
+  grid-template-rows: auto auto minmax(56px, 1fr) auto auto;
+  padding: 16px;
+}
+
+.menu-card-footer,
+.panel-heading,
+.configurator-footer,
+.guided-footer,
+.checkout-total,
+.receipt-lines div {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.compact-action {
+  background: #1b5e57;
+  border: 1px solid #1b5e57;
+  color: #ffffff;
+  font-weight: 800;
+  padding: 0 12px;
+}
+
+.cart-lines,
+.summary-stack,
+.review-list,
+.option-groups,
+.receipt-lines {
+  display: grid;
+  gap: 12px;
+}
+
+.cart-line,
+.review-list div,
+.summary-stack div {
+  border-bottom: 1px solid #ece4db;
+  display: grid;
+  gap: 10px;
+  padding-bottom: 12px;
+}
+
+.cart-line:last-child,
+.review-list div:last-child,
+.summary-stack div:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.cart-line > div:first-child,
+.summary-stack div,
+.receipt-lines div {
+  min-width: 0;
+}
+
+.cart-line strong,
+.cart-line span,
+.cart-line small,
+.summary-stack span,
+.summary-stack strong {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.quantity-control {
+  align-items: center;
+  display: inline-flex;
+  gap: 8px;
+}
+
+.quantity-control button {
+  background: #ffffff;
+  border: 1px solid #cabfb4;
+  color: #1d1d1f;
+  font-weight: 900;
+  width: 40px;
+}
+
+.quantity-control span {
+  font-weight: 850;
+  min-width: 24px;
+  text-align: center;
+}
+
+.checkout-total {
+  border-top: 1px solid #e3dacf;
+  padding-top: 16px;
+}
+
+.checkout-total strong {
+  font-size: 22px;
+}
+
+.choice-card {
+  background: #fffdfa;
+  border: 1px solid #ded4c8;
+  border-radius: 8px;
+  color: inherit;
+  display: grid;
+  gap: 12px;
+  min-height: 190px;
+  padding: 18px;
+  text-align: left;
+}
+
+.choice-card[aria-pressed="true"] {
+  border-color: #b43b2f;
+  box-shadow: inset 0 0 0 2px #b43b2f;
+}
+
+.choice-card span {
+  font-size: 20px;
+  font-weight: 850;
+}
+
+.choice-card small {
+  color: #5d554c;
+  line-height: 1.45;
+}
+
+.guided-footer {
+  justify-content: flex-end;
+}
+
+.notice-strip {
+  align-items: center;
+  background: #fff8db;
+  border: 1px solid #dcc86d;
+  border-radius: 8px;
+  color: #3f3210;
+  display: flex;
+  gap: 14px;
+  justify-content: space-between;
+  padding: 14px 16px;
+}
+
+.notice-strip span {
+  flex: 1;
+}
+
+.ingredient-row,
+.option-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ingredient-row span {
+  background: #edf4f2;
+  border: 1px solid #c9ded8;
+  border-radius: 999px;
+  color: #27544e;
+  font-size: 12px;
+  font-weight: 750;
+  padding: 5px 9px;
+}
+
+.configurator-panel {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+}
+
+.option-group {
+  display: grid;
+  gap: 10px;
+}
+
+.option-group > div:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.option-pill {
+  align-items: center;
+  display: inline-flex;
+  gap: 8px;
+}
+
+.option-pill:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.premium-line {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.remove-action {
+  justify-self: start;
+  min-height: 32px;
+  padding: 0;
+}
+
+.server-confirmation,
+.receipt-panel {
+  border-top: 1px solid #e3dacf;
+  display: grid;
+  gap: 14px;
+  padding-top: 16px;
+}
+
 @media (max-width: 760px) {
   .topbar {
     align-items: flex-start;
@@ -290,8 +717,34 @@ h1 {
   }
 
   .content-grid,
-  .auth-layout {
+  .auth-layout,
+  .home-stack,
+  .classic-layout,
+  .guided-layout,
+  .premium-layout {
     grid-template-columns: 1fr;
+  }
+
+  .home-stack .status-panel {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .mode-grid,
+  .menu-grid,
+  .premium-menu-grid,
+  .choice-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .kiosk-header,
+  .notice-strip {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .checkout-panel {
+    position: static;
   }
 
   .nav-actions,

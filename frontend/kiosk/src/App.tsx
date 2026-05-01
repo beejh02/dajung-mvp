@@ -4,6 +4,9 @@ import { AppShell } from "./components/common/AppShell";
 import { LoginPage } from "./pages/auth/LoginPage";
 import { SignupPage } from "./pages/auth/SignupPage";
 import { HomePage } from "./pages/HomePage";
+import { ClassicGridPage } from "./pages/kiosk/ClassicGridPage";
+import { DajungPremiumPage } from "./pages/kiosk/DajungPremiumPage";
+import { GuidedOrderPage } from "./pages/kiosk/GuidedOrderPage";
 import { authApi } from "./lib/api/auth";
 import {
   clearAuthSession,
@@ -13,6 +16,7 @@ import {
   type AuthSession,
 } from "./lib/auth/session";
 import { getKioskRouteFromPathname, type KioskRoute } from "./routes/routes";
+import type { UserRead } from "../../../shared/frontend-client/src";
 
 export default function App() {
   const [route, setRoute] = useState<KioskRoute>(() => getKioskRouteFromPathname(window.location.pathname));
@@ -87,6 +91,17 @@ export default function App() {
     navigate("/login");
   };
 
+  const handleUserRefreshed = (user: UserRead) => {
+    setSession((currentSession) => {
+      if (!currentSession) {
+        return null;
+      }
+      const refreshedSession = replaceAuthSessionUser(currentSession, user);
+      saveAuthSession(refreshedSession);
+      return refreshedSession;
+    });
+  };
+
   return (
     <AppShell
       currentRoute={route}
@@ -112,6 +127,15 @@ export default function App() {
         <SignupPage
           onAuthenticated={handleAuthenticated}
           onNavigate={navigate}
+        />
+      )}
+      {route === "/kiosk/classic-grid" && <ClassicGridPage />}
+      {route === "/kiosk/guided-order" && <GuidedOrderPage />}
+      {route === "/kiosk/dajung-premium" && (
+        <DajungPremiumPage
+          session={session}
+          onNavigate={navigate}
+          onUserRefreshed={handleUserRefreshed}
         />
       )}
     </AppShell>
