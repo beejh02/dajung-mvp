@@ -58,9 +58,10 @@ export default function App() {
         if (!isActive) {
           return;
         }
+        console.error(error);
         clearAuthSession();
         setSession(null);
-        setSessionError(error instanceof Error ? error.message : "Session restore failed");
+        setSessionError("저장된 로그인 세션을 복원하지 못했습니다. 다시 로그인해 주세요.");
       })
       .finally(() => {
         if (isActive) {

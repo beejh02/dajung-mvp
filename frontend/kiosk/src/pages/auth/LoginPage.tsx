@@ -25,7 +25,8 @@ export function LoginPage({ onAuthenticated, onNavigate }: LoginPageProps) {
       const response = await authApi.login({ email, password });
       onAuthenticated(createAuthSession(response));
     } catch (submitError: unknown) {
-      setError(submitError instanceof Error ? submitError.message : "Sign in failed");
+      console.error(submitError);
+      setError("로그인에 실패했습니다. 이메일과 비밀번호를 확인해 주세요.");
     } finally {
       setIsSubmitting(false);
     }
@@ -34,14 +35,14 @@ export function LoginPage({ onAuthenticated, onNavigate }: LoginPageProps) {
   return (
     <section className="auth-layout">
       <div>
-        <p className="eyebrow">Dajung account</p>
-        <h1>Sign in</h1>
-        <p className="lead">Use the same backend account that will own kiosk and agent orders.</p>
+        <p className="eyebrow">다정 계정</p>
+        <h1>로그인</h1>
+        <p className="lead">키오스크 주문과 포인트 적립에 사용할 다정 계정으로 로그인하세요.</p>
       </div>
 
       <form className="auth-form" onSubmit={handleSubmit}>
         <label>
-          <span>Email</span>
+          <span>이메일</span>
           <input
             autoComplete="email"
             name="email"
@@ -52,7 +53,7 @@ export function LoginPage({ onAuthenticated, onNavigate }: LoginPageProps) {
           />
         </label>
         <label>
-          <span>Password</span>
+          <span>비밀번호</span>
           <input
             autoComplete="current-password"
             name="password"
@@ -64,10 +65,10 @@ export function LoginPage({ onAuthenticated, onNavigate }: LoginPageProps) {
         </label>
         {error && <p className="error-text">{error}</p>}
         <button className="primary-action full-width" type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Signing in" : "Sign in"}
+          {isSubmitting ? "로그인 중" : "로그인"}
         </button>
         <button className="text-action" type="button" onClick={() => onNavigate("/signup")}>
-          Create account
+          회원가입
         </button>
       </form>
     </section>

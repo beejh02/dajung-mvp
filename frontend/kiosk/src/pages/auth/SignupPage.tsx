@@ -32,7 +32,8 @@ export function SignupPage({ onAuthenticated, onNavigate }: SignupPageProps) {
       });
       onAuthenticated(createAuthSession(response));
     } catch (submitError: unknown) {
-      setError(submitError instanceof Error ? submitError.message : "Account creation failed");
+      console.error(submitError);
+      setError("회원가입에 실패했습니다. 입력한 정보를 다시 확인해 주세요.");
     } finally {
       setIsSubmitting(false);
     }
@@ -41,14 +42,14 @@ export function SignupPage({ onAuthenticated, onNavigate }: SignupPageProps) {
   return (
     <section className="auth-layout">
       <div>
-        <p className="eyebrow">New account</p>
-        <h1>Create account</h1>
-        <p className="lead">Create a backend-backed user session before opening order screens.</p>
+        <p className="eyebrow">새 계정</p>
+        <h1>회원가입</h1>
+        <p className="lead">다정 키오스크 주문과 포인트 적립에 사용할 계정을 만듭니다.</p>
       </div>
 
       <form className="auth-form" onSubmit={handleSubmit}>
         <label>
-          <span>Name</span>
+          <span>이름</span>
           <input
             autoComplete="name"
             name="name"
@@ -59,7 +60,7 @@ export function SignupPage({ onAuthenticated, onNavigate }: SignupPageProps) {
           />
         </label>
         <label>
-          <span>Email</span>
+          <span>이메일</span>
           <input
             autoComplete="email"
             name="email"
@@ -70,7 +71,7 @@ export function SignupPage({ onAuthenticated, onNavigate }: SignupPageProps) {
           />
         </label>
         <label>
-          <span>Phone</span>
+          <span>휴대폰 번호</span>
           <input
             autoComplete="tel"
             name="phone"
@@ -80,7 +81,7 @@ export function SignupPage({ onAuthenticated, onNavigate }: SignupPageProps) {
           />
         </label>
         <label>
-          <span>Password</span>
+          <span>비밀번호</span>
           <input
             autoComplete="new-password"
             minLength={8}
@@ -93,10 +94,10 @@ export function SignupPage({ onAuthenticated, onNavigate }: SignupPageProps) {
         </label>
         {error && <p className="error-text">{error}</p>}
         <button className="primary-action full-width" type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Creating account" : "Create account"}
+          {isSubmitting ? "계정 생성 중" : "회원가입"}
         </button>
         <button className="text-action" type="button" onClick={() => onNavigate("/login")}>
-          Sign in
+          로그인
         </button>
       </form>
     </section>

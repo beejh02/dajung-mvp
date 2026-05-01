@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import type {
   MenuItemRead,
@@ -33,17 +33,47 @@ interface PremiumCartItem extends PremiumDraftItem {
   cartId: string;
 }
 
+interface PremiumCategorySection {
+  id: string;
+  category: string;
+  title: string;
+  label: string;
+  icon: string;
+  items: MenuItemRead[];
+}
+
 interface DajungPremiumPageProps {
   session: AuthSession | null;
   onNavigate(route: KioskRoute): void;
   onUserRefreshed(user: UserRead): void;
 }
 
+const categoryMeta: Record<string, { title: string; label: string; icon: string; order: number }> = {
+  set: { title: "추천 세트 메뉴", label: "세트", icon: "🍔", order: 1 },
+  burger: { title: "버거 메뉴", label: "버거", icon: "🍔", order: 2 },
+  side: { title: "사이드 메뉴", label: "사이드", icon: "🍟", order: 3 },
+  drink: { title: "음료 메뉴", label: "음료", icon: "🥤", order: 4 },
+  dessert: { title: "디저트 메뉴", label: "디저트", icon: "🍦", order: 5 },
+};
+
 function createClientKey(prefix: string): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
     return `${prefix}:${crypto.randomUUID()}`;
   }
   return `${prefix}:${Date.now()}:${Math.random().toString(16).slice(2)}`;
+}
+
+function createSectionId(category: string): string {
+  return `premium-category-${category.replace(/[^a-zA-Z0-9_-]/g, "-")}`;
+}
+
+function getCategoryMeta(category: string) {
+  return categoryMeta[category] ?? {
+    title: `${category} 메뉴`,
+    label: category,
+    icon: "🍽️",
+    order: 99,
+  };
 }
 
 function getAvailableChoices(group: MenuOptionGroup): MenuOptionChoice[] {
@@ -96,7 +126,7 @@ function summarizeSelections(menuItem: MenuItemRead, selections: SelectionMap): 
     .map((choiceId) => findChoice(menuItem, choiceId)?.name ?? null)
     .filter((choice): choice is string => choice !== null);
 
-  return selectedNames.length > 0 ? selectedNames.join(", ") : "No options";
+  return selectedNames.length > 0 ? selectedNames.join(", ") : "기본 구성";
 }
 
 function toOrderItemInput(cartItem: PremiumCartItem): OrderCreateItem {
@@ -112,13 +142,18 @@ function toOrderItemInput(cartItem: PremiumCartItem): OrderCreateItem {
   };
 }
 
-function getErrorMessage(error: unknown, fallback: string): string {
-  return error instanceof Error ? error.message : fallback;
+function getKoreanErrorMessage(error: unknown, fallback: string): string {
+  if (error instanceof Error) {
+    console.error(error);
+  }
+  return fallback;
 }
 
 export function DajungPremiumPage({ session, onNavigate, onUserRefreshed }: DajungPremiumPageProps) {
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const [menuItems, setMenuItems] = useState<MenuItemRead[]>([]);
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeCategoryId, setActiveCategoryId] = useState("");
   const [draftItem, setDraftItem] = useState<PremiumDraftItem | null>(null);
   const [cart, setCart] = useState<PremiumCartItem[]>([]);
   const [order, setOrder] = useState<OrderRead | null>(null);
@@ -146,7 +181,7 @@ export function DajungPremiumPage({ session, onNavigate, onUserRefreshed }: Daju
       })
       .catch((error: unknown) => {
         if (isActive) {
-          setMenuError(getErrorMessage(error, "Menu request failed"));
+          setMenuError(getKoreanErrorMessage(error, "메뉴를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요."));
         }
       })
       .finally(() => {
@@ -165,19 +200,68 @@ export function DajungPremiumPage({ session, onNavigate, onUserRefreshed }: Daju
     return dajungItems.length > 0 ? dajungItems : menuItems.filter((item) => item.is_available);
   }, [menuItems]);
 
-  const categories = useMemo(
-    () => ["All", ...Array.from(new Set(premiumMenuItems.map((item) => item.category)))],
-    [premiumMenuItems],
-  );
+  const categorySections = useMemo<PremiumCategorySection[]>(() => {
+    const groupedItems = premiumMenuItems.reduce<Record<string, MenuItemRead[]>>((groups, item) => {
+      groups[item.category] = [...(groups[item.category] ?? []), item];
+      return groups;
+    }, {});
 
-  const visibleMenuItems = activeCategory === "All"
-    ? premiumMenuItems
-    : premiumMenuItems.filter((item) => item.category === activeCategory);
+    return Object.entries(groupedItems)
+      .map(([category, items]) => {
+        const meta = getCategoryMeta(category);
+        return {
+          id: createSectionId(category),
+          category,
+          title: meta.title,
+          label: meta.label,
+          icon: meta.icon,
+          items,
+        };
+      })
+      .sort((left, right) => {
+        const leftMeta = getCategoryMeta(left.category);
+        const rightMeta = getCategoryMeta(right.category);
+        return leftMeta.order - rightMeta.order || left.label.localeCompare(right.label);
+      });
+  }, [premiumMenuItems]);
+
+  useEffect(() => {
+    if (!activeCategoryId && categorySections.length > 0) {
+      setActiveCategoryId(categorySections[0].id);
+    }
+  }, [activeCategoryId, categorySections]);
+
+  useEffect(() => {
+    const root = scrollRef.current;
+    if (!root || categorySections.length === 0) {
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleEntry = entries.find((entry) => entry.isIntersecting);
+        if (visibleEntry) {
+          setActiveCategoryId(visibleEntry.target.id);
+        }
+      },
+      { root, threshold: 0.28 },
+    );
+
+    categorySections.forEach((section) => {
+      const element = sectionRefs.current[section.id];
+      if (element) {
+        observer.observe(element);
+      }
+    });
+
+    return () => observer.disconnect();
+  }, [categorySections]);
 
   const cartTotal = cart.reduce(
     (sum, item) => sum + calculateUnitPrice(item.menuItem, item.selections) * item.quantity,
     0,
   );
+  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   const resetCheckout = () => {
     setOrder(null);
@@ -186,6 +270,11 @@ export function DajungPremiumPage({ session, onNavigate, onUserRefreshed }: Daju
     setReceipt(null);
     setPaymentKey(null);
     setFlowError(null);
+  };
+
+  const scrollToCategory = (sectionId: string) => {
+    sectionRefs.current[sectionId]?.scrollIntoView({ behavior: "smooth", block: "start" });
+    setActiveCategoryId(sectionId);
   };
 
   const openConfigurator = (menuItem: MenuItemRead) => {
@@ -292,7 +381,7 @@ export function DajungPremiumPage({ session, onNavigate, onUserRefreshed }: Daju
       setOrder(createdOrder);
       setPaymentKey(createClientKey("kiosk-premium-payment"));
     } catch (error: unknown) {
-      setFlowError(getErrorMessage(error, "Order creation failed"));
+      setFlowError(getKoreanErrorMessage(error, "주문 확인에 실패했습니다. 선택한 옵션을 확인해 주세요."));
     } finally {
       setIsCreatingOrder(false);
     }
@@ -324,92 +413,162 @@ export function DajungPremiumPage({ session, onNavigate, onUserRefreshed }: Daju
       setOrder(refreshedOrder);
       onUserRefreshed(refreshedUser);
     } catch (error: unknown) {
-      setFlowError(getErrorMessage(error, "Dummy payment failed"));
+      setFlowError(getKoreanErrorMessage(error, "더미 결제 승인에 실패했습니다. 다시 시도해 주세요."));
     } finally {
       setIsApprovingPayment(false);
     }
   };
 
+  const handleCheckout = () => {
+    if (!session) {
+      onNavigate("/login");
+      return;
+    }
+
+    if (payment?.status === "approved") {
+      return;
+    }
+
+    if (order) {
+      void approvePayment();
+      return;
+    }
+
+    void createServerOrder();
+  };
+
+  const getCheckoutLabel = () => {
+    if (!session) {
+      return "로그인하고 결제하기";
+    }
+    if (isCreatingOrder) {
+      return "주문 확인 중";
+    }
+    if (isApprovingPayment) {
+      return "결제 승인 중";
+    }
+    if (payment?.status === "approved") {
+      return "결제 완료";
+    }
+    if (order) {
+      return "서버 금액으로 결제 승인";
+    }
+    return "결제하기";
+  };
+
+  const isCheckoutDisabled = cart.length === 0 || isCreatingOrder || isApprovingPayment || payment?.status === "approved";
+
   return (
-    <section className="kiosk-workspace">
-      <div className="kiosk-header premium-header">
-        <div>
-          <p className="eyebrow">Live backend flow</p>
-          <h1>Dajung Premium</h1>
-          <p className="lead">
-            Real menu loading, server-priced order confirmation, dummy payment, points, and receipt.
-          </p>
+    <section className="premium-menu-page">
+      <header className="premium-menu-header">
+        <button className="premium-logo-button" type="button" onClick={() => onNavigate("/")}>
+          <span>DAJUNG</span> BURGER
+        </button>
+        <div className="premium-header-actions">
+          <span>{session ? `${session.user.name}님` : "로그인 필요"}</span>
+          <button className="premium-back-button" type="button" onClick={() => onNavigate("/")}>
+            처음으로
+          </button>
         </div>
-        <div className="live-badge">API connected</div>
-      </div>
+      </header>
 
       {!session && (
-        <div className="notice-strip">
-          <strong>Sign in required</strong>
-          <span>Menu browsing is available, but order creation and payment need a Dajung account session.</span>
+        <div className="notice-strip premium-notice">
+          <strong>로그인이 필요합니다</strong>
+          <span>메뉴 탐색은 가능하지만 주문 생성과 더미 결제는 다정 계정으로 로그인해야 진행됩니다.</span>
           <button className="secondary-action" type="button" onClick={() => onNavigate("/login")}>
-            Sign in
+            로그인
           </button>
         </div>
       )}
 
-      <div className="premium-layout">
-        <div className="order-surface">
-          <div className="segmented-control" aria-label="Premium categories">
-            {categories.map((category) => (
-              <button
-                key={category}
-                className="segment-button"
-                type="button"
-                aria-pressed={activeCategory === category}
-                onClick={() => setActiveCategory(category)}
-              >
-                {category}
-              </button>
-            ))}
+      <main className="premium-menu-main">
+        <nav className="premium-sidebar" aria-label="메뉴 카테고리">
+          {categorySections.length === 0 && (
+            <div className="premium-sidebar-empty">메뉴 준비 중</div>
+          )}
+          {categorySections.map((section) => (
+            <button
+              key={section.id}
+              className="premium-sidebar-item"
+              type="button"
+              aria-current={activeCategoryId === section.id ? "true" : undefined}
+              onClick={() => scrollToCategory(section.id)}
+            >
+              <span className="premium-sidebar-icon" aria-hidden="true">{section.icon}</span>
+              <span>{section.label}</span>
+            </button>
+          ))}
+        </nav>
+
+        <div ref={scrollRef} className="premium-scroll-content">
+          <div className="premium-hero-strip">
+            <div>
+              <p className="eyebrow">실시간 주문 키오스크</p>
+              <h1>다정 프리미엄</h1>
+              <p>
+                실제 메뉴 API를 불러와 장바구니를 구성하고, 서버가 다시 계산한 금액으로 주문과 더미 결제를 진행합니다.
+              </p>
+            </div>
+            <div className="live-badge">API 연동</div>
           </div>
 
-          {isLoadingMenu && <p className="muted-text">Loading live menu...</p>}
+          {isLoadingMenu && <p className="premium-state-text">메뉴를 불러오는 중입니다.</p>}
           {menuError && <p className="error-text">{menuError}</p>}
-          {!isLoadingMenu && !menuError && visibleMenuItems.length === 0 && (
-            <p className="muted-text">No available menu items.</p>
+          {!isLoadingMenu && !menuError && categorySections.length === 0 && (
+            <p className="premium-state-text">현재 주문 가능한 메뉴가 없습니다.</p>
           )}
 
-          <div className="menu-grid premium-menu-grid">
-            {visibleMenuItems.map((item) => (
-              <article className="menu-card" key={item.id}>
-                <div className="menu-visual live" aria-hidden="true">
-                  <span>{item.category}</span>
-                </div>
-                <div className="menu-card-body">
-                  <p className="menu-category">{item.category}</p>
-                  <h2>{item.name}</h2>
-                  <p>{item.description ?? "Dajung menu item"}</p>
-                  <div className="ingredient-row">
-                    {item.ingredients.slice(0, 3).map((ingredient) => (
-                      <span key={ingredient}>{ingredient}</span>
-                    ))}
-                  </div>
-                  <div className="menu-card-footer">
-                    <strong>{formatKrw(item.price)}</strong>
-                    <button className="compact-action" type="button" onClick={() => openConfigurator(item)}>
-                      Customize
+          {categorySections.map((section) => (
+            <section
+              key={section.id}
+              id={section.id}
+              className="premium-menu-section"
+              ref={(element) => {
+                sectionRefs.current[section.id] = element;
+              }}
+            >
+              <h2 className="premium-category-title">
+                <span>{section.icon}</span>
+                {section.title}
+              </h2>
+              <div className="premium-card-grid">
+                {section.items.map((item) => (
+                  <article className="premium-menu-card" key={item.id}>
+                    <button className="premium-card-button" type="button" onClick={() => openConfigurator(item)}>
+                      <div className="premium-image-box">
+                        {item.image_url ? (
+                          <img src={item.image_url} alt={item.name} />
+                        ) : (
+                          <span aria-hidden="true">{section.icon}</span>
+                        )}
+                      </div>
+                      <div className="premium-menu-info">
+                        <p className="premium-menu-name">{item.name}</p>
+                        <p className="premium-menu-desc">{item.description ?? "다정 프리미엄 메뉴입니다."}</p>
+                        <div className="premium-menu-meta">
+                          <strong>{formatKrw(item.price)}</strong>
+                          <span>옵션 선택</span>
+                        </div>
+                      </div>
                     </button>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+          ))}
 
           {draftItem && (
-            <div className="configurator-panel" aria-label="Customize item">
+            <section className="premium-configurator" aria-label="메뉴 옵션 선택">
               <div className="panel-heading">
                 <div>
                   <p className="panel-title">{draftItem.menuItem.name}</p>
-                  <p className="muted-text">{formatKrw(calculateUnitPrice(draftItem.menuItem, draftItem.selections))} each</p>
+                  <p className="muted-text">
+                    옵션 포함 예상 단가 {formatKrw(calculateUnitPrice(draftItem.menuItem, draftItem.selections))}
+                  </p>
                 </div>
                 <button className="text-action" type="button" onClick={() => setDraftItem(null)}>
-                  Close
+                  닫기
                 </button>
               </div>
 
@@ -419,7 +578,7 @@ export function DajungPremiumPage({ session, onNavigate, onUserRefreshed }: Daju
                     <div>
                       <strong>{group.name}</strong>
                       <span>
-                        {group.required ? "Required" : "Optional"} / choose {group.min_select}-{group.max_select}
+                        {group.required ? "필수" : "선택"} / {group.min_select}개부터 {group.max_select}개까지 선택
                       </span>
                     </div>
                     <div className="option-pills">
@@ -445,7 +604,7 @@ export function DajungPremiumPage({ session, onNavigate, onUserRefreshed }: Daju
               </div>
 
               <div className="configurator-footer">
-                <div className="quantity-control" aria-label="Draft quantity">
+                <div className="quantity-control" aria-label="선택 수량">
                   <button type="button" onClick={() => updateDraftQuantity(-1)}>-</button>
                   <span>{draftItem.quantity}</span>
                   <button type="button" onClick={() => updateDraftQuantity(1)}>+</button>
@@ -456,71 +615,22 @@ export function DajungPremiumPage({ session, onNavigate, onUserRefreshed }: Daju
                   disabled={!isSelectionValid(draftItem.menuItem, draftItem.selections)}
                   onClick={addDraftToCart}
                 >
-                  Add to cart
+                  장바구니 담기
                 </button>
               </div>
-            </div>
+            </section>
           )}
-        </div>
-
-        <aside className="checkout-panel premium-checkout" aria-label="Premium checkout">
-          <div className="panel-heading">
-            <div>
-              <p className="panel-title">Premium cart</p>
-              <span>{session ? session.user.name : "Guest"}</span>
-            </div>
-            {session && <strong>{formatPoints(session.user.points_balance)}</strong>}
-          </div>
-
-          {cart.length === 0 ? (
-            <p className="muted-text">Customize a Dajung menu item to start.</p>
-          ) : (
-            <div className="cart-lines">
-              {cart.map((item) => (
-                <div className="cart-line premium-line" key={item.cartId}>
-                  <div>
-                    <strong>{item.menuItem.name}</strong>
-                    <span>{summarizeSelections(item.menuItem, item.selections)}</span>
-                    <small>
-                      {formatKrw(calculateUnitPrice(item.menuItem, item.selections))} x {item.quantity}
-                    </small>
-                  </div>
-                  <div className="quantity-control" aria-label={`${item.menuItem.name} quantity`}>
-                    <button type="button" onClick={() => updateCartQuantity(item.cartId, -1)}>-</button>
-                    <span>{item.quantity}</span>
-                    <button type="button" onClick={() => updateCartQuantity(item.cartId, 1)}>+</button>
-                  </div>
-                  <button className="text-action remove-action" type="button" onClick={() => removeCartItem(item.cartId)}>
-                    Remove
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-
-          <div className="checkout-total">
-            <span>Cart preview</span>
-            <strong>{formatKrw(cartTotal)}</strong>
-          </div>
-
-          <button
-            className="primary-action full-width"
-            type="button"
-            disabled={cart.length === 0 || isCreatingOrder}
-            onClick={createServerOrder}
-          >
-            {!session ? "Sign in to order" : isCreatingOrder ? "Creating order" : "Create server order"}
-          </button>
 
           {order && (
-            <div className="server-confirmation">
+            <section className="premium-order-panel" aria-label="서버 주문 확인">
               <div className="panel-heading">
                 <div>
-                  <p className="panel-title">Server confirmation</p>
-                  <span>Order #{order.id} / {order.status}</span>
+                  <p className="panel-title">서버 주문 확인</p>
+                  <span>주문번호 #{order.id} / 상태 {order.status}</span>
                 </div>
                 <strong>{formatKrw(order.total_amount)}</strong>
               </div>
+              <p className="muted-text">아래 금액은 백엔드가 메뉴와 옵션 기준으로 다시 계산한 확정 금액입니다.</p>
               <div className="summary-stack">
                 {order.items.map((item) => (
                   <div key={item.id}>
@@ -529,33 +639,25 @@ export function DajungPremiumPage({ session, onNavigate, onUserRefreshed }: Daju
                   </div>
                 ))}
               </div>
-              <button
-                className="primary-action full-width"
-                type="button"
-                disabled={isApprovingPayment || payment?.status === "approved"}
-                onClick={approvePayment}
-              >
-                {isApprovingPayment ? "Approving payment" : "Approve dummy payment"}
-              </button>
-            </div>
+            </section>
           )}
 
           {flowError && <p className="error-text">{flowError}</p>}
 
           {payment && receipt && points && (
-            <div className="receipt-panel">
-              <p className="success-text">Payment approved: {payment.dummy_approval_code}</p>
+            <section className="premium-order-panel receipt-panel" aria-label="결제 완료 및 영수증">
+              <p className="success-text">더미 결제가 승인되었습니다. 승인번호 {payment.dummy_approval_code}</p>
               <div className="summary-stack">
                 <div>
-                  <span>Receipt</span>
+                  <span>영수증 번호</span>
                   <strong>{receipt.receipt_number}</strong>
                 </div>
                 <div>
-                  <span>Earned points</span>
+                  <span>적립 포인트</span>
                   <strong>{formatPoints(receipt.content.earned_points)}</strong>
                 </div>
                 <div>
-                  <span>Current balance</span>
+                  <span>현재 포인트</span>
                   <strong>{formatPoints(points.points_balance)}</strong>
                 </div>
               </div>
@@ -567,10 +669,41 @@ export function DajungPremiumPage({ session, onNavigate, onUserRefreshed }: Daju
                   </div>
                 ))}
               </div>
-            </div>
+            </section>
           )}
-        </aside>
-      </div>
+        </div>
+      </main>
+
+      <footer className="premium-cart-footer">
+        <div className="premium-cart-info">
+          <p>선택한 메뉴 : {cartCount}개</p>
+          <strong>{order ? formatKrw(order.total_amount) : formatKrw(cartTotal)}</strong>
+          <span>{order ? "서버 확정 금액" : "장바구니 예상 금액"}</span>
+        </div>
+        <div className="premium-cart-lines">
+          {cart.length === 0 ? (
+            <span>메뉴 카드를 눌러 옵션을 선택해 주세요.</span>
+          ) : (
+            cart.slice(0, 2).map((item) => (
+              <div key={item.cartId}>
+                <span>{item.menuItem.name} x {item.quantity}</span>
+                <button type="button" onClick={() => updateCartQuantity(item.cartId, -1)}>-</button>
+                <button type="button" onClick={() => updateCartQuantity(item.cartId, 1)}>+</button>
+                <button type="button" onClick={() => removeCartItem(item.cartId)}>삭제</button>
+              </div>
+            ))
+          )}
+          {cart.length > 2 && <span>외 {cart.length - 2}개 메뉴</span>}
+        </div>
+        <button
+          className="premium-order-button"
+          type="button"
+          disabled={isCheckoutDisabled}
+          onClick={handleCheckout}
+        >
+          {getCheckoutLabel()}
+        </button>
+      </footer>
     </section>
   );
 }

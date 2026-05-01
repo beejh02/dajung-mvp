@@ -20,24 +20,26 @@ export function AppShell({
   onNavigate,
   onSignOut,
 }: AppShellProps) {
+  const isPremiumRoute = currentRoute === "/kiosk/dajung-premium";
+
   return (
-    <div className="app-shell">
+    <div className={`app-shell${isPremiumRoute ? " premium-app-shell" : ""}`}>
       <header className="topbar">
         <button className="brand-button" type="button" onClick={() => onNavigate("/")}>
           <span className="brand-mark">D</span>
           <span>
-            <span className="brand-name">Dajung</span>
-            <span className="brand-context">Kiosk</span>
+            <span className="brand-name">다정</span>
+            <span className="brand-context">키오스크</span>
           </span>
         </button>
-        <nav className="nav-actions" aria-label="Primary">
+        <nav className="nav-actions" aria-label="주요 화면">
           <button
             className="nav-link"
             type="button"
             aria-current={currentRoute === "/" ? "page" : undefined}
             onClick={() => onNavigate("/")}
           >
-            Home
+            홈
           </button>
           <button
             className="nav-link"
@@ -45,7 +47,7 @@ export function AppShell({
             aria-current={currentRoute === "/kiosk/classic-grid" ? "page" : undefined}
             onClick={() => onNavigate("/kiosk/classic-grid")}
           >
-            Classic
+            클래식
           </button>
           <button
             className="nav-link"
@@ -53,7 +55,7 @@ export function AppShell({
             aria-current={currentRoute === "/kiosk/guided-order" ? "page" : undefined}
             onClick={() => onNavigate("/kiosk/guided-order")}
           >
-            Guided
+            가이드
           </button>
           <button
             className="nav-link"
@@ -61,11 +63,11 @@ export function AppShell({
             aria-current={currentRoute === "/kiosk/dajung-premium" ? "page" : undefined}
             onClick={() => onNavigate("/kiosk/dajung-premium")}
           >
-            Premium
+            프리미엄
           </button>
           {session ? (
             <button className="nav-link" type="button" onClick={onSignOut}>
-              Sign out
+              로그아웃
             </button>
           ) : (
             <>
@@ -75,7 +77,7 @@ export function AppShell({
                 aria-current={currentRoute === "/login" ? "page" : undefined}
                 onClick={() => onNavigate("/login")}
               >
-                Sign in
+                로그인
               </button>
               <button
                 className="primary-action"
@@ -83,7 +85,7 @@ export function AppShell({
                 aria-current={currentRoute === "/signup" ? "page" : undefined}
                 onClick={() => onNavigate("/signup")}
               >
-                Create account
+                회원가입
               </button>
             </>
           )}
