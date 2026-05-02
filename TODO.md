@@ -125,26 +125,26 @@
 
 ## Phase 8. Streamlit AI Agent
 
-- [ ] Streamlit 채팅 UI 작성
-- [ ] 다정 handoff token 수신 처리
-- [ ] Agent 세션 교환 처리
-- [ ] `LLMProvider` 인터페이스 작성
-- [ ] `StubLLMProvider` 구현: 사용자 입력 기반 predefined intent JSON 반환
-- [ ] API Key 없이 실행 가능한 demo mode 처리
-- [ ] `models/gemma-4-26b-a4b-it` 목표 모델 식별자 설정값 정의
-- [ ] Google Gemini API Provider 교체 가능 구조 준비
-- [ ] Cloudflare Workers AI Provider 교체 가능 구조 준비
-- [ ] 시스템 프롬프트 작성
-- [ ] 메뉴 조회 도구 구현
-- [ ] 사용자 컨텍스트 조회 도구 구현
-- [ ] 주문 초안 생성 도구 구현
-- [ ] 주문 확정 도구 구현
-- [ ] 더미 결제 도구 구현
-- [ ] 영수증 조회 도구 구현
-- [ ] 포인트 조회 도구 구현
-- [ ] 결제 전 사용자 확인 흐름 구현
-- [ ] intent JSON 검증 실패 시 재질문 흐름 구현
-- [ ] 비활성 메뉴/옵션 요청 시 대체 메뉴 제안 흐름 구현
+- [x] Streamlit 채팅 UI 작성
+- [x] 다정 handoff token 수신 처리
+- [x] Agent 세션 교환 처리
+- [x] `LLMProvider` 인터페이스 작성
+- [x] `StubLLMProvider` 구현: 사용자 입력 기반 predefined intent JSON 반환
+- [x] API Key 없이 실행 가능한 demo mode 처리
+- [x] `models/gemma-4-26b-a4b-it` 목표 모델 식별자 설정값 정의
+- [x] Google Gemini API Provider 교체 가능 구조 준비
+- [x] Cloudflare Workers AI Provider 교체 가능 구조 준비
+- [x] 시스템 프롬프트 작성
+- [x] 메뉴 조회 도구 구현
+- [x] 사용자 컨텍스트 조회 도구 구현
+- [x] 주문 초안 생성 도구 구현
+- [x] 주문 확정 도구 구현
+- [x] 더미 결제 도구 구현
+- [x] 영수증 조회 도구 구현
+- [x] 포인트 조회 도구 구현
+- [x] 결제 전 사용자 확인 흐름 구현
+- [x] intent JSON 검증 실패 시 재질문 흐름 구현
+- [x] 비활성 메뉴/옵션 요청 시 대체 메뉴 제안 흐름 구현
 
 ## Phase 9. 기업 MCP 서버
 
