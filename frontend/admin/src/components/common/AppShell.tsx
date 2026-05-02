@@ -27,21 +27,31 @@ export function AppShell({
           <span className="brand-mark">D</span>
           <span>
             <span className="brand-name">Dajung</span>
-            <span className="brand-context">Admin</span>
+            <span className="brand-context">관리자</span>
           </span>
         </button>
-        <nav className="nav-actions" aria-label="Primary">
+        <nav className="nav-actions" aria-label="주요 메뉴">
           <button
             className="nav-link"
             type="button"
             aria-current={currentRoute === "/" ? "page" : undefined}
             onClick={() => onNavigate("/")}
           >
-            Home
+            개요
           </button>
+          {session?.user.role === "admin" && (
+            <button
+              className="nav-link"
+              type="button"
+              aria-current={currentRoute.startsWith("/orders") ? "page" : undefined}
+              onClick={() => onNavigate("/orders")}
+            >
+              주문
+            </button>
+          )}
           {session ? (
             <button className="nav-link" type="button" onClick={onSignOut}>
-              Sign out
+              로그아웃
             </button>
           ) : (
             <>
@@ -51,7 +61,7 @@ export function AppShell({
                 aria-current={currentRoute === "/login" ? "page" : undefined}
                 onClick={() => onNavigate("/login")}
               >
-                Sign in
+                로그인
               </button>
               <button
                 className="primary-action"
@@ -59,7 +69,7 @@ export function AppShell({
                 aria-current={currentRoute === "/signup" ? "page" : undefined}
                 onClick={() => onNavigate("/signup")}
               >
-                Create account
+                계정 만들기
               </button>
             </>
           )}

@@ -5,6 +5,7 @@ from fastapi import FastAPI
 
 from app.core.config import get_settings
 from app.db.session import init_db
+from app.routers.admin import router as admin_router
 from app.routers.auth import router as auth_router
 from app.routers.health import router as health_router
 from app.routers.menu import router as menu_router
@@ -34,6 +35,7 @@ def create_app() -> FastAPI:
     app.include_router(payments_router)
     app.include_router(points_router)
     app.include_router(receipts_router)
+    app.include_router(admin_router)
     app.include_router(health_router)
     return app
 

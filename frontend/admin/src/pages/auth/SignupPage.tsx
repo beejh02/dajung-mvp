@@ -2,6 +2,7 @@ import type { FormEvent } from "react";
 import { useState } from "react";
 
 import { authApi } from "../../lib/api/auth";
+import { toKoreanApiError } from "../../lib/api/errors";
 import { createAuthSession, type AuthSession } from "../../lib/auth/session";
 import type { AdminRoute } from "../../routes/routes";
 
@@ -32,7 +33,7 @@ export function SignupPage({ onAuthenticated, onNavigate }: SignupPageProps) {
       });
       onAuthenticated(createAuthSession(response));
     } catch (submitError: unknown) {
-      setError(submitError instanceof Error ? submitError.message : "Account creation failed");
+      setError(toKoreanApiError(submitError, "계정을 만들지 못했습니다."));
     } finally {
       setIsSubmitting(false);
     }
@@ -41,14 +42,14 @@ export function SignupPage({ onAuthenticated, onNavigate }: SignupPageProps) {
   return (
     <section className="auth-layout">
       <div>
-        <p className="eyebrow">New account</p>
-        <h1>Create account</h1>
-        <p className="lead">New backend accounts start without administrator privileges.</p>
+        <p className="eyebrow">새 계정</p>
+        <h1>계정 만들기</h1>
+        <p className="lead">새 계정은 일반 사용자 권한으로 생성됩니다.</p>
       </div>
 
       <form className="auth-form" onSubmit={handleSubmit}>
         <label>
-          <span>Name</span>
+          <span>이름</span>
           <input
             autoComplete="name"
             name="name"
@@ -59,7 +60,7 @@ export function SignupPage({ onAuthenticated, onNavigate }: SignupPageProps) {
           />
         </label>
         <label>
-          <span>Email</span>
+          <span>이메일</span>
           <input
             autoComplete="email"
             name="email"
@@ -70,7 +71,7 @@ export function SignupPage({ onAuthenticated, onNavigate }: SignupPageProps) {
           />
         </label>
         <label>
-          <span>Phone</span>
+          <span>전화번호</span>
           <input
             autoComplete="tel"
             name="phone"
@@ -80,7 +81,7 @@ export function SignupPage({ onAuthenticated, onNavigate }: SignupPageProps) {
           />
         </label>
         <label>
-          <span>Password</span>
+          <span>비밀번호</span>
           <input
             autoComplete="new-password"
             minLength={8}
@@ -93,10 +94,10 @@ export function SignupPage({ onAuthenticated, onNavigate }: SignupPageProps) {
         </label>
         {error && <p className="error-text">{error}</p>}
         <button className="primary-action full-width" type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Creating account" : "Create account"}
+          {isSubmitting ? "가입 중" : "계정 만들기"}
         </button>
         <button className="text-action" type="button" onClick={() => onNavigate("/login")}>
-          Sign in
+          로그인으로 돌아가기
         </button>
       </form>
     </section>

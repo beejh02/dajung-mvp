@@ -1,5 +1,7 @@
 export { ApiError, createApiClient } from "./api/client";
 export type { ApiClient, ApiClientOptions } from "./api/client";
+export { createAdminApi } from "./api/admin";
+export type { AdminApi } from "./api/admin";
 export { createAuthApi } from "./api/auth";
 export type { AuthApi } from "./api/auth";
 export { createMenuApi } from "./api/menu";
@@ -22,6 +24,15 @@ export {
 } from "./auth/session";
 export type { AuthSession } from "./auth/session";
 export { formatKrw, formatPoints } from "./formatting/currency";
+export type {
+  AdminOrderDetailRead,
+  AdminOrderSourceStatRead,
+  AdminOrderSummaryRead,
+  AdminOverviewRead,
+  AdminPaymentStatusRead,
+  AdminPointLedgerEntryRead,
+  AdminReceiptStatusRead,
+} from "./types/admin";
 export type {
   AgentHandoffResponse,
   LoginRequest,

@@ -11,8 +11,10 @@ import {
 } from "./lib/auth/session";
 import { LoginPage } from "./pages/auth/LoginPage";
 import { SignupPage } from "./pages/auth/SignupPage";
-import { HomePage } from "./pages/HomePage";
-import { getAdminRouteFromPathname, type AdminRoute } from "./routes/routes";
+import { DashboardPage } from "./pages/dashboard/DashboardPage";
+import { OrderDetailPage } from "./pages/orders/OrderDetailPage";
+import { OrdersPage } from "./pages/orders/OrdersPage";
+import { getAdminRouteFromPathname, getOrderIdFromRoute, type AdminRoute } from "./routes/routes";
 
 export default function App() {
   const [route, setRoute] = useState<AdminRoute>(() => getAdminRouteFromPathname(window.location.pathname));
@@ -56,7 +58,7 @@ export default function App() {
         }
         clearAuthSession();
         setSession(null);
-        setSessionError(error instanceof Error ? error.message : "Session restore failed");
+        setSessionError("세션을 다시 확인하지 못했습니다.");
       })
       .finally(() => {
         if (isActive) {
@@ -87,6 +89,8 @@ export default function App() {
     navigate("/login");
   };
 
+  const orderDetailId = getOrderIdFromRoute(route);
+
   return (
     <AppShell
       currentRoute={route}
@@ -96,9 +100,22 @@ export default function App() {
       onSignOut={handleSignOut}
     >
       {route === "/" && (
-        <HomePage
+        <DashboardPage
           session={session}
           sessionError={sessionError}
+          onNavigate={navigate}
+        />
+      )}
+      {route === "/orders" && (
+        <OrdersPage
+          session={session}
+          onNavigate={navigate}
+        />
+      )}
+      {orderDetailId !== null && (
+        <OrderDetailPage
+          orderId={orderDetailId}
+          session={session}
           onNavigate={navigate}
         />
       )}
