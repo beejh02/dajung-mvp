@@ -148,19 +148,19 @@
 
 ## Phase 9. 기업 MCP 서버
 
-- [ ] FastAPI fake MCP HTTP 서버 엔트리포인트 작성
-- [ ] 공식 MCP SDK 없이 동작하는 tool 호출 HTTP API 작성
-- [ ] FastAPI 백엔드 클라이언트 작성
-- [ ] tool adapter 경계 작성: HTTP 요청/응답과 tool 실행 로직 분리
-- [ ] `mcp-server/app/tools/` 아래에 tool 로직 분리
-- [ ] `dajung.get_menu` tool 구현
-- [ ] `dajung.submit_order` tool 구현
-- [ ] `dajung.approve_dummy_payment` tool 구현
-- [ ] `dajung.get_receipt` tool 구현
-- [ ] `dajung.list_recent_orders` tool 구현
-- [ ] 실제 MCP Tool형 입력/출력 스키마 문서화
-- [ ] MCP tool 백엔드 API 오류 변환 처리
-- [ ] 추후 공식 Python MCP SDK adapter 전환 지점 문서화
+- [x] FastAPI fake MCP HTTP 서버 엔트리포인트 작성
+- [x] 공식 MCP SDK 없이 동작하는 tool 호출 HTTP API 작성
+- [x] FastAPI 백엔드 클라이언트 작성
+- [x] tool adapter 경계 작성: HTTP 요청/응답과 tool 실행 로직 분리
+- [x] `mcp-server/app/tools/` 아래에 tool 로직 분리
+- [x] `dajung.get_menu` tool 구현
+- [x] `dajung.submit_order` tool 구현
+- [x] `dajung.approve_dummy_payment` tool 구현
+- [x] `dajung.get_receipt` tool 구현
+- [x] `dajung.list_recent_orders` tool 구현
+- [x] 실제 MCP Tool형 입력/출력 스키마 문서화
+- [x] MCP tool 백엔드 API 오류 변환 처리
+- [x] 추후 공식 Python MCP SDK adapter 전환 지점 문서화
 - [ ] 확장 후보 tool 보류: `dajung.get_user_profile`, `dajung.create_order_draft`, `dajung.get_admin_overview`
 
 ## Phase 10. 통합 검증
