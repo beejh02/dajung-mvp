@@ -90,9 +90,9 @@ SQLite Dummy DB
   └─ receipts
 ```
 
-## 4. 계획된 폴더 구조
+## 4. 현재 폴더 구조
 
-이번 단계에서는 아래 폴더를 만들지 않습니다. 실제 구현 단계에서 순서대로 생성합니다.
+Phase 11 기준 실제 구현 구조는 다음과 같습니다. 일부 초기 계획의 폴더명은 구현 과정에서 단순화되었습니다.
 
 ```text
 dajung-mvp/
@@ -103,16 +103,10 @@ dajung-mvp/
   frontend/
     kiosk/
       src/
-        app/
         pages/
           auth/
           kiosk/
-            classic-grid/
-            guided-order/
-            dajung-premium/
         components/
-          auth/
-          kiosk/
           common/
         lib/
           api/
@@ -122,13 +116,10 @@ dajung-mvp/
 
     admin/
       src/
-        app/
         pages/
           dashboard/
           orders/
-          receipts/
         components/
-          dashboard/
           orders/
           common/
         lib/
@@ -147,71 +138,57 @@ dajung-mvp/
 
     dummy-data/
       users.json
-      menu_items.json
-      orders.sample.json
+      menus.json
+      order_history.json
+      preferences.json
+      rag_contexts.json
 
     docs/
-      auth-flow.md
-      order-flow.md
-      agent-tools.md
-      mcp-tools.md
-      rag-extension-plan.md
+      API_SPEC.md
+      AGENT_TOOLS.md
+      MVP_DEMO.md
 
   backend/
     app/
-      main.py
-      core/
-        config.py
-        security.py
-      db/
-        session.py
-        seed.py
-      models/
-        enums.py
-      schemas/
-      routers/
-        auth.py
-        menu.py
-        orders.py
-        payments.py
-        points.py
-        receipts.py
-        admin.py
-        agent.py
-      services/
-        auth_service.py
-        order_service.py
-        payment_service.py
-        points_service.py
-        receipt_service.py
+      app/
+        main.py
+        core/
+        db/
+        models/
+        schemas/
+        routers/
+        services/
       tests/
 
-  mcp-server/
-    app/
-      main.py
-      config.py
-      backend_client.py
-      tools/
-        menu.py
-        users.py
-        orders.py
-        payments.py
-        receipts.py
-        admin.py
+  scripts/
+    phase10_integration_check.py
+```
 
-  ai-agent/
+MCP tool 상세 문서는 `mcp-server/app/docs/mcp_tools.md`에 둡니다.
+
+초기 계획에서 `auth-flow.md`, `order-flow.md`, `rag-extension-plan.md`처럼 분리하려던 문서는 Phase 11에서 `API_SPEC.md`, `AGENT_TOOLS.md`, `MVP_DEMO.md`로 통합 정리했습니다.
+
+```text
+mcp-server/
+  app/
     app/
       main.py
-      config.py
-      model_client.py
-      session_handoff.py
+      adapter.py
+      backend_client.py
+      schemas.py
       tools/
-        menu_tools.py
-        order_tools.py
-        payment_tools.py
-        receipt_tools.py
-      prompts/
-        system_prompt.md
+    docs/
+      mcp_tools.md
+
+ai-agent/
+  app/
+    app.py
+    config.py
+    model_client.py
+    session_handoff.py
+    backend_client.py
+    tools/
+    prompts/
 ```
 
 `frontend/kiosk`와 `frontend/admin`의 `lib/api`와 `lib/auth`는 앱별 래퍼만 두고, 실제 HTTP 클라이언트, 인증 토큰 처리, 공통 타입은 `shared/frontend-client`에서 공유합니다.
@@ -240,6 +217,8 @@ Streamlit 앱은 React 앱과 실행 포트가 다를 수 있으므로, 단순�
 6. Agent는 해당 세션으로 메뉴 조회, 주문 생성, 결제, 영수증 조회 API를 호출합니다.
 
 이 방식은 "한 번 로그인하면 AI 채팅으로 주문 가능"이라는 요구사항을 만족하면서, Streamlit과 React가 느슨하게 결합되도록 합니다.
+
+Phase 11 기준으로 handoff token API와 Streamlit token 수신은 구현되어 있습니다. React 키오스크에서 Streamlit으로 자동 이동하는 별도 버튼은 구현되어 있지 않으므로, 시연에서는 API로 발급한 handoff token을 Streamlit 사이드바 또는 URL query로 전달합니다.
 
 ### handoff token 정책
 
@@ -386,10 +365,11 @@ Streamlit 앱은 React 앱과 실행 포트가 다를 수 있으므로, 단순�
 
 - `POST /auth/signup`
 - `POST /auth/login`
-- `POST /auth/logout`
 - `GET /auth/me`
 - `POST /auth/agent-handoff`
 - `POST /auth/agent-session`
+
+`POST /auth/logout`은 구현되어 있지 않습니다. MVP에서는 클라이언트가 저장한 token을 삭제하는 방식으로 로그아웃합니다.
 
 ### Menu
 
@@ -430,6 +410,7 @@ Streamlit 앱은 React 앱과 실행 포트가 다를 수 있으므로, 단순�
 
 - `GET /admin/overview`
 - `GET /admin/orders`
+- `GET /admin/orders/{order_id}`
 - `GET /admin/payments`
 - `GET /admin/points`
 - `GET /admin/receipts`
@@ -506,7 +487,7 @@ AI Agent는 자체 DB 접근 없이 백엔드 API만 호출합니다. Agent 주�
 
 기업 MCP 서버는 다정의 내부 비즈니스 도구를 표준화된 MCP 도구 형태로 노출합니다. 초기 MVP에서는 공식 MCP SDK를 바로 사용하지 않고 FastAPI 기반 fake MCP HTTP 서버로 시작합니다.
 
-MVP fake MCP 서버는 비즈니스 로직을 직접 구현하지 않고 FastAPI 백엔드 API를 호출하는 얇은 어댑터로 둡니다. Tool 이름과 입출력 구조는 실제 MCP Tool처럼 설계하고, tool 로직은 `mcp-server/app/tools/` 아래에 분리합니다. HTTP 엔드포인트와 tool 실행 계층은 나중에 공식 Python MCP SDK로 교체할 수 있도록 어댑터 경계를 유지합니다.
+MVP fake MCP 서버는 비즈니스 로직을 직접 구현하지 않고 FastAPI 백엔드 API를 호출하는 얇은 어댑터로 둡니다. Tool 이름과 입출력 구조는 실제 MCP Tool처럼 설계하고, tool 로직은 `mcp-server/app/app/tools/` 아래에 분리합니다. HTTP 엔드포인트와 tool 실행 계층은 나중에 공식 Python MCP SDK로 교체할 수 있도록 어댑터 경계를 유지합니다.
 
 ### MVP 필수 MCP Tools
 
@@ -584,6 +565,20 @@ MVP에서는 RAG를 구현하지 않습니다. 다만 다음 확장을 고려해
 - 모델 출력 JSON 검증 실패 시 재질문하는지 확인
 - MCP tool별 입력/출력 스키마와 백엔드 API 실패 변환을 확인
 
+### Phase 10 통합 검증 결과
+
+Phase 10에서 다음 검증을 완료했습니다.
+
+- 회원가입부터 `Dajung Premium` 키오스크 주문 완료까지 통과
+- 로그인부터 AI Agent handoff token 교환과 채팅 주문 완료까지 통과
+- 더미 결제 후 포인트 적립과 영수증 생성 확인
+- 관리자 대시보드에 키오스크 주문과 AI Agent 주문이 함께 반영되는지 확인
+- 비로그인 주문 제한, handoff token 만료/재사용 방지, 관리자 API 일반 사용자 접근 거부 확인
+- 더미 결제 재시도 시 결제/포인트/영수증 중복 미생성 확인
+- MCP tool 입력/출력 스키마와 백엔드 실패 응답 변환 확인
+
+반복 실행용 검증 스크립트는 `scripts/phase10_integration_check.py`입니다.
+
 ## 14. 성공 기준
 
 - React 앱에서 키오스크 UI 3종을 전환해 볼 수 있습니다.
@@ -594,3 +589,13 @@ MVP에서는 RAG를 구현하지 않습니다. 다만 다음 확장을 고려해
 - Streamlit AI Agent가 로그인 세션을 기반으로 주문을 생성할 수 있습니다.
 - Streamlit AI Agent가 API Key 없이 `StubLLMProvider` demo mode로 주문 흐름을 시연할 수 있습니다.
 - MCP 서버가 최소한 메뉴 조회와 주문 관련 도구를 제공합니다.
+- RAG, 음성, STT, TTS는 MVP 범위에서 제외되어 있습니다.
+
+## 15. MVP 제한사항
+
+- 실제 결제 PG 연동은 없습니다.
+- 실제 LLM API 호출은 없습니다. Google Gemini API와 Cloudflare Workers AI provider는 교체 지점만 준비되어 있습니다.
+- 실제 RAG 검색은 없습니다. `shared/dummy-data/rag_contexts.json`은 추후 확장용 원천 텍스트입니다.
+- 음성 입력, STT, TTS는 없습니다.
+- React 키오스크에서 AI 채팅으로 자동 이동하는 UI는 없습니다.
+- Fake MCP HTTP 서버는 공식 MCP SDK 서버가 아닙니다.

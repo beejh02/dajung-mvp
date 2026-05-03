@@ -1,6 +1,6 @@
 # 다정(多情) MVP TODO
 
-이 TODO는 코드가 없는 상태에서 시작하는 개발 순서입니다. 현재 단계에서는 문서만 작성하고, 실제 폴더와 코드는 다음 단계부터 생성합니다.
+이 TODO는 코드가 없는 상태에서 시작한 단계별 개발 체크리스트입니다. Phase 11 기준으로 MVP 구현과 통합 검증을 완료하고, 실제 구현 상태에 맞춰 완료 여부를 정리합니다.
 
 ## Phase 0. 문서 및 범위 확정
 
@@ -152,7 +152,7 @@
 - [x] 공식 MCP SDK 없이 동작하는 tool 호출 HTTP API 작성
 - [x] FastAPI 백엔드 클라이언트 작성
 - [x] tool adapter 경계 작성: HTTP 요청/응답과 tool 실행 로직 분리
-- [x] `mcp-server/app/tools/` 아래에 tool 로직 분리
+- [x] `mcp-server/app/app/tools/` 아래에 tool 로직 분리
 - [x] `dajung.get_menu` tool 구현
 - [x] `dajung.submit_order` tool 구현
 - [x] `dajung.approve_dummy_payment` tool 구현
@@ -161,7 +161,7 @@
 - [x] 실제 MCP Tool형 입력/출력 스키마 문서화
 - [x] MCP tool 백엔드 API 오류 변환 처리
 - [x] 추후 공식 Python MCP SDK adapter 전환 지점 문서화
-- [ ] 확장 후보 tool 보류: `dajung.get_user_profile`, `dajung.create_order_draft`, `dajung.get_admin_overview`
+- [x] 확장 후보 tool 보류: `dajung.get_user_profile`, `dajung.create_order_draft`, `dajung.get_admin_overview`
 
 ## Phase 10. 통합 검증
 
@@ -179,20 +179,20 @@
 
 ## Phase 11. 정리 및 MVP 마감
 
-- [ ] README 실행 방법 업데이트
-- [ ] API 명세 업데이트
-- [ ] Agent 도구 명세 업데이트
-- [ ] MCP 서버 사용 방법 업데이트
-- [ ] demo mode, Stub LLM, fake MCP HTTP 서버 제한사항 정리
-- [ ] 추후 RAG 확장 계획 정리
-- [ ] 음성/STT/TTS 제외 범위 재명시
-- [ ] 데모 시나리오 작성
+- [x] README 실행 방법 업데이트
+- [x] API 명세 업데이트
+- [x] Agent 도구 명세 업데이트
+- [x] MCP 서버 사용 방법 업데이트
+- [x] demo mode, Stub LLM, fake MCP HTTP 서버 제한사항 정리
+- [x] 추후 RAG 확장 계획 정리
+- [x] 음성/STT/TTS 제외 범위 재명시
+- [x] 데모 시나리오 작성
 
 ## MVP 완료 기준
 
-- [ ] 로그인한 사용자가 `Dajung Premium` 키오스크에서 주문을 완료할 수 있습니다.
-- [ ] 로그인한 사용자가 AI 채팅에서 주문을 완료할 수 있습니다.
-- [ ] 주문 완료 시 더미 결제, 포인트 적립, 영수증 생성이 자동 처리됩니다.
-- [ ] 관리자 대시보드에서 모든 주문 출처가 확인됩니다.
-- [ ] MCP 서버가 핵심 비즈니스 도구를 노출합니다.
-- [ ] RAG, 음성, STT, TTS가 MVP 범위에서 제외되어 있습니다.
+- [x] 로그인한 사용자가 `Dajung Premium` 키오스크에서 주문을 완료할 수 있습니다.
+- [x] 로그인한 사용자가 AI 채팅에서 주문을 완료할 수 있습니다.
+- [x] 주문 완료 시 더미 결제, 포인트 적립, 영수증 생성이 자동 처리됩니다.
+- [x] 관리자 대시보드에서 모든 주문 출처가 확인됩니다.
+- [x] MCP 서버가 핵심 비즈니스 도구를 노출합니다.
+- [x] RAG, 음성, STT, TTS가 MVP 범위에서 제외되어 있습니다.

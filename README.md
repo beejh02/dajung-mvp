@@ -1,200 +1,183 @@
 # 다정(多情) MVP
 
-다정 MVP는 햄버거 키오스크 주문 경험을 여러 UI 방향으로 검증하고, 하나의 고완성도 UI를 실제 백엔드와 연결한 뒤, 로그인된 사용자가 텍스트 채팅형 AI Agent로도 주문할 수 있게 만드는 프로토타입입니다.
+다정 MVP는 햄버거 키오스크 주문, 로그인 기반 사용자 계정, 텍스트 채팅형 AI Agent, 관리자 대시보드, Fake MCP HTTP 서버를 하나의 FastAPI 백엔드 주문 파이프라인으로 연결하는 로컬 프로토타입입니다.
 
-Phase 1부터는 최소 실행 가능한 프로젝트 스캐폴딩을 시작합니다. 이 문서는 전체 구조, 확정된 기술 선택, 개발 순서를 합의하기 위한 기준 문서입니다.
+## MVP 상태
 
-## MVP 목표
+- `Dajung Premium` 키오스크는 실제 백엔드 메뉴, 주문, 더미 결제, 포인트, 영수증 API와 연결되어 있습니다.
+- `Classic Grid`와 `Guided Order`는 비교용 mock UI입니다.
+- 관리자 대시보드는 `role=admin` 사용자만 접근할 수 있고 주문, 결제, 포인트, 영수증, 주문 출처 통계를 표시합니다.
+- Streamlit AI Agent는 handoff token으로 Agent 세션을 교환하고 백엔드 Agent API만 호출합니다.
+- AI Agent는 API Key 없이 `StubLLMProvider` demo mode로 동작합니다.
+- Fake MCP HTTP 서버는 공식 MCP SDK 없이 tool 호출 HTTP API를 제공하며, 비즈니스 로직을 직접 구현하지 않고 백엔드 API를 호출합니다.
+- 실제 결제 PG, 실제 RAG, 음성 입력, STT, TTS는 MVP 범위에서 제외되어 있습니다.
 
-- React 기반 햄버거 키오스크 UI 3종 구현
-- 3종 중 1종은 고완성도 UI로 제작하고 FastAPI 백엔드와 실제 연동
-- 다정 회원가입/로그인을 위한 더미 사용자 DB 구현
-- 주문 생성, 더미 결제, 포인트 적립, 영수증 생성, 관리자 대시보드 반영
-- 기업 내부 도구 역할의 MCP 서버 구현
-- Streamlit 기반 텍스트 채팅형 AI Agent 구현
-- AI Agent는 `models/gemma-4-26b-a4b-it` 모델 사용
-- 사용자는 다정 플랫폼에 한 번 로그인하면 AI 채팅에서도 주문 가능
-- MVP에서는 음성, STT, TTS 제외
-- RAG는 구현하지 않고, 추후 확장 가능한 구조만 고려
+## 기술 스택
 
-## 핵심 사용자 흐름
-
-1. 사용자가 다정 플랫폼에서 회원가입 또는 로그인합니다.
-2. 사용자는 React 키오스크 UI 또는 Streamlit AI 채팅 중 하나를 통해 메뉴를 탐색합니다.
-3. 주문 항목, 옵션, 수량을 선택합니다.
-4. 백엔드는 주문을 생성하고 더미 결제를 처리합니다.
-5. 결제 완료 후 포인트를 적립하고 영수증을 생성합니다.
-6. 관리자 대시보드에는 주문, 결제, 포인트, 영수증 상태가 반영됩니다.
-7. AI Agent 주문도 동일한 백엔드 주문 파이프라인을 사용합니다.
-
-## 확정 기술 스택
-
-- Frontend: React, TypeScript, Vite
-- Frontend Package Manager: pnpm
-- Backend: FastAPI, Pydantic, SQLModel
-- Python Package Manager: uv
-- Local DB: SQLite
-- Auth: JWT + AI 채팅 진입용 일회성 handoff token
+- Frontend: React, TypeScript, Vite, pnpm
+- Backend: FastAPI, Pydantic, SQLModel, SQLite
+- Python runtime: uv 기반 가상환경
+- Auth: JWT + 3분 만료 일회성 handoff token
 - Agent UI: Streamlit
-- AI Model: `models/gemma-4-26b-a4b-it`
-- MCP Server: Python 기반 MCP 서버
+- Agent model boundary: `LLMProvider`, `StubLLMProvider`, 목표 모델 식별자 `models/gemma-4-26b-a4b-it`
+- MCP Server: FastAPI 기반 Fake MCP HTTP 서버
 
 ## 로컬 실행 방법
 
-Phase 1은 최소 실행 가능한 스캐폴딩만 포함합니다. 주문, 결제, 포인트, MCP tool, AI 채팅 로직은 아직 구현하지 않습니다.
+Windows PowerShell 기준입니다. `pnpm.ps1` 실행 정책 문제가 있으면 `pnpm.cmd`를 사용합니다.
 
-### 키오스크 프론트엔드
-
-```powershell
-cd frontend/kiosk
-pnpm install
-pnpm dev --host 127.0.0.1 --port 5173
-```
-
-### 관리자 프론트엔드
-
-```powershell
-cd frontend/admin
-pnpm install
-pnpm dev --host 127.0.0.1 --port 5174
-```
-
-### 백엔드 API
+### 1. 백엔드 API
 
 ```powershell
 cd backend/app
 uv venv
 uv pip install --python .venv\Scripts\python.exe -r requirements.txt
-.venv\Scripts\uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+.venv\Scripts\uvicorn.exe app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
-헬스체크: `GET http://127.0.0.1:8000/health`
+확인:
 
-### AI Agent
+```powershell
+Invoke-RestMethod http://127.0.0.1:8000/health
+```
+
+### 2. 키오스크 프론트엔드
+
+```powershell
+cd frontend/kiosk
+pnpm.cmd install
+pnpm.cmd dev --host 127.0.0.1 --port 5173
+```
+
+기본 API 주소는 `http://127.0.0.1:8000`입니다. 다른 백엔드 포트를 쓰면 Vite 환경 변수로 `VITE_API_BASE_URL`을 지정합니다.
+
+### 3. 관리자 프론트엔드
+
+```powershell
+cd frontend/admin
+pnpm.cmd install
+pnpm.cmd dev --host 127.0.0.1 --port 5174
+```
+
+관리자 화면은 seed 데이터의 관리자 계정 또는 직접 생성한 `role=admin` 사용자로 로그인해야 사용할 수 있습니다.
+
+### 4. Streamlit AI Agent
 
 ```powershell
 cd ai-agent/app
 uv venv
 uv pip install --python .venv\Scripts\python.exe -r requirements.txt
-.venv\Scripts\streamlit run app.py
+$env:BACKEND_API_BASE_URL = "http://127.0.0.1:8000"
+.venv\Scripts\streamlit.exe run app.py --server.address 127.0.0.1 --server.port 8502
 ```
 
-### Fake MCP HTTP 서버
+AI Agent는 다음 방식으로 세션을 연결합니다.
+
+- 백엔드 `POST /auth/agent-handoff`로 handoff token 발급
+- Streamlit 사이드바에 handoff token 입력
+- 또는 `http://127.0.0.1:8502/?handoff_token=<token>` 형태로 전달
+
+현재 React 키오스크에서 Streamlit으로 자동 이동하는 버튼은 별도 구현하지 않았습니다. 시연에서는 handoff token을 API로 발급해 Streamlit에 전달합니다.
+
+### 5. Fake MCP HTTP 서버
 
 ```powershell
 cd mcp-server/app
 uv venv
 uv pip install --python .venv\Scripts\python.exe -r requirements.txt
-.venv\Scripts\uvicorn app.main:app --reload --host 127.0.0.1 --port 8010
+$env:BACKEND_API_BASE_URL = "http://127.0.0.1:8000"
+.venv\Scripts\uvicorn.exe app.main:app --reload --host 127.0.0.1 --port 8010
 ```
 
-헬스체크: `GET http://127.0.0.1:8010/health`
+확인:
 
-## 계획된 프로젝트 구조
+```powershell
+Invoke-RestMethod http://127.0.0.1:8010/health
+Invoke-RestMethod http://127.0.0.1:8010/mcp/tools
+```
 
-아래 구조는 Phase 1에서 생성한 초기 구조이며, 세부 기능 코드는 이후 단계에서 추가합니다.
+## 주요 API
+
+상세 명세는 [shared/docs/API_SPEC.md](shared/docs/API_SPEC.md)를 기준으로 합니다.
+
+- Auth: `POST /auth/signup`, `POST /auth/login`, `GET /auth/me`, `POST /auth/agent-handoff`, `POST /auth/agent-session`
+- Menu: `GET /menu`, `GET /menu/{menu_item_id}`
+- Orders: `POST /orders`, `GET /orders/my`, `GET /orders/{order_id}`, `PATCH /orders/{order_id}/status`
+- Payments: `POST /payments/dummy/approve`, `GET /payments/{payment_id}`
+- Points: `GET /points/me`, `GET /points/ledger`
+- Receipts: `GET /receipts/{receipt_id}`, `GET /orders/{order_id}/receipt`
+- Admin: `GET /admin/overview`, `GET /admin/orders`, `GET /admin/orders/{order_id}`, `GET /admin/payments`, `GET /admin/points`, `GET /admin/receipts`
+- Agent/Internal: `GET /agent/menu`, `GET /agent/user-context`, `POST /agent/orders/draft`, `POST /agent/orders/confirm`, `POST /agent/payments/dummy/approve`
+
+## AI Agent와 MCP 문서
+
+- Agent 도구와 demo mode 제한사항: [shared/docs/AGENT_TOOLS.md](shared/docs/AGENT_TOOLS.md)
+- MCP HTTP tool 사용법: [mcp-server/app/docs/mcp_tools.md](mcp-server/app/docs/mcp_tools.md)
+- MVP 데모 시나리오와 통합 검증 결과: [shared/docs/MVP_DEMO.md](shared/docs/MVP_DEMO.md)
+
+## 프로젝트 구조
 
 ```text
 dajung-mvp/
-  README.md
-  PROJECT_SPEC.md
-  TODO.md
-
   frontend/
-    kiosk/
-      # React 키오스크 앱
-      # 로그인/회원가입, 키오스크 UI 3종, AI 채팅 진입 포함
-
-    admin/
-      # React 관리자 대시보드 앱
-      # 주문, 결제, 포인트, 영수증 운영 현황 표시
-
+    kiosk/          # React 키오스크 앱
+    admin/          # React 관리자 대시보드 앱
   backend/
-    app/
-      # FastAPI 백엔드
-      # 인증, 메뉴, 주문, 결제, 포인트, 영수증, 관리자 API
-
-  mcp-server/
-    app/
-      # 기업 MCP 서버
-      # Agent 또는 외부 MCP 클라이언트가 사용할 비즈니스 도구 제공
-
+    app/            # FastAPI 백엔드, DB 모델, 라우터, 서비스, 테스트
   ai-agent/
-    app/
-      # Streamlit 텍스트 채팅형 AI Agent
-      # 다정 로그인 세션과 연결된 주문 채팅 UI
-
+    app/            # Streamlit AI Agent, LLMProvider, tool wrapper
+  mcp-server/
+    app/            # Fake MCP HTTP 서버와 tool adapter
   shared/
-    frontend-client/
-      # kiosk/admin이 공유하는 API 클라이언트, 인증 유틸, 공통 타입
-
-    dummy-data/
-      # 더미 사용자, 메뉴, 주문 샘플 데이터
-
-    docs/
-      # 아키텍처, 인증 흐름, Agent 도구, MCP 도구 설계
+    frontend-client/# kiosk/admin 공통 API client, type, auth utility
+    dummy-data/     # 더미 사용자, 메뉴, 선호도, 주문 히스토리, RAG용 원천 텍스트
+    docs/           # API, Agent, 데모, 제한사항 문서
+  scripts/
+    phase10_integration_check.py
 ```
 
-## React 키오스크 UI 3종 방향
+## 검증 명령
 
-1. `Kiosk A - Classic Grid`
-   - 일반적인 패스트푸드 키오스크 구조
-   - 카테고리 탭, 메뉴 그리드, 장바구니, 결제 버튼 중심
-   - 빠른 구현과 비교 기준 역할
+```powershell
+cd backend/app
+.venv\Scripts\python.exe -m pytest
+```
 
-2. `Kiosk B - Guided Order`
-   - 단계형 주문 경험
-   - 버거 선택, 옵션 선택, 사이드/음료 추천, 확인 순서
-   - 초보 사용자에게 친절한 UX 검증
+```powershell
+cd frontend/kiosk
+pnpm.cmd typecheck
+pnpm.cmd build
+```
 
-3. `Kiosk C - Dajung Premium`
-   - 고완성도 UI 대상
-   - 실제 FastAPI 백엔드와 연동
-   - 주문 생성, 더미 결제, 포인트, 영수증, 관리자 반영까지 연결
+```powershell
+cd frontend/admin
+pnpm.cmd typecheck
+pnpm.cmd build
+```
 
-`Classic Grid`와 `Guided Order`는 비교용 mock UI로 유지하고, 실제 백엔드 연동은 `Dajung Premium`에 집중합니다.
+```powershell
+cd mcp-server/app
+.venv\Scripts\python.exe -m compileall app
+```
 
-## 백엔드 책임
+```powershell
+cd ai-agent/app
+.venv\Scripts\python.exe -m compileall app.py backend_client.py config.py model_client.py session_handoff.py tools
+```
 
-- 사용자 회원가입/로그인
-- 더미 사용자 DB 관리
-- 메뉴 데이터 제공
-- 주문 생성 및 상태 관리
-- 더미 결제 승인 처리
-- 포인트 적립 및 조회
-- 영수증 생성 및 조회
-- 관리자 대시보드용 집계 API 제공
-- AI Agent와 MCP 서버가 사용할 내부 API 제공
-- 주문 생성 시 클라이언트 금액을 신뢰하지 않고 메뉴/옵션 기준으로 서버에서 가격 재계산
-- 더미 결제 승인, 주문 상태 변경, 포인트 적립, 영수증 생성을 단일 트랜잭션으로 처리
-- 결제 승인 API 재시도 시 포인트와 영수증이 중복 생성되지 않도록 idempotent하게 처리
+백엔드와 MCP 서버를 실행한 뒤 전체 HTTP 통합 검증:
 
-## AI Agent 책임
+```powershell
+$env:BACKEND_API_BASE_URL = "http://127.0.0.1:8000"
+$env:MCP_API_BASE_URL = "http://127.0.0.1:8010"
+.\backend\app\.venv\Scripts\python.exe scripts\phase10_integration_check.py
+```
 
-- Streamlit 텍스트 채팅 UI 제공
-- 로그인된 다정 사용자 세션과 연결
-- 사용자의 자연어 주문 요청을 구조화된 주문으로 변환
-- 메뉴 조회, 주문 생성, 더미 결제, 영수증 조회 도구 호출
-- DB를 직접 읽거나 쓰지 않고 백엔드 API만 호출
-- RAG 없이 동작하되, 추후 지식 검색 도구를 추가할 수 있는 구조 유지
+## MVP 제한사항
 
-## MCP 서버 책임
-
-- 다정 내부 비즈니스 기능을 MCP 도구로 노출
-- 비즈니스 로직을 직접 구현하지 않고 FastAPI 백엔드 API를 호출하는 얇은 어댑터로 동작
-- MVP 필수 도구는 메뉴 조회, 주문 제출, 더미 결제 승인, 영수증 조회, 최근 주문 조회로 제한
-
-## 개발 원칙
-
-- UI 3종은 비교 가능해야 하지만, 실제 백엔드 연동은 `Dajung Premium` 1종에 집중합니다.
-- 주문, 결제, 포인트, 영수증은 React와 AI Agent가 같은 백엔드 파이프라인을 사용합니다.
-- 결제는 실제 PG 연동 없이 더미 승인으로 구현합니다.
-- DB는 MVP 단계에서 SQLite + SQLModel로 시작하고, 교체 가능한 레이어를 둡니다.
-- 주문, 결제, 주문 출처, 포인트 적립 유형은 명시적 enum으로 관리합니다.
-- 관리자 API는 `role=admin` 사용자만 접근할 수 있게 합니다.
-- RAG, 음성, STT, TTS는 MVP 범위에서 제외합니다.
-
-## 관련 문서
-
-- `PROJECT_SPEC.md`: 상세 제품/기술 명세
-- `TODO.md`: 단계별 개발 체크리스트
+- 실제 결제 PG는 연결하지 않았고 더미 결제 승인만 제공합니다.
+- 실제 Google Gemini API 또는 Cloudflare Workers AI 호출은 구현하지 않았습니다. provider 교체 지점만 준비되어 있으며 API Key가 없으면 `StubLLMProvider`를 사용합니다.
+- 실제 RAG 검색은 구현하지 않았습니다. `shared/dummy-data/rag_contexts.json`은 추후 확장을 위한 원천 텍스트입니다.
+- 음성 입력, STT, TTS는 구현하지 않았습니다.
+- Fake MCP HTTP 서버는 공식 MCP SDK 서버가 아닙니다. 추후 `mcp-server/app/app/adapter.py` 경계를 공식 Python MCP SDK adapter로 교체하는 구조입니다.
+- 로컬 SQLite 개발 DB와 seed 데이터는 시연용이며 실사용 개인정보를 담지 않습니다.
