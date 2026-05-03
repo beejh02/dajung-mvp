@@ -11,8 +11,8 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 
-BACKEND_BASE_URL = os.getenv("BACKEND_API_BASE_URL", "http://127.0.0.1:8002").rstrip("/")
-MCP_BASE_URL = os.getenv("MCP_API_BASE_URL", "http://127.0.0.1:8012").rstrip("/")
+BACKEND_BASE_URL = os.getenv("BACKEND_API_BASE_URL", "http://127.0.0.1:8000").rstrip("/")
+MCP_BASE_URL = os.getenv("MCP_API_BASE_URL", "http://127.0.0.1:8010").rstrip("/")
 ADMIN_EMAIL = os.getenv("DAJUNG_ADMIN_EMAIL", "admin@example.test")
 ADMIN_PASSWORD = os.getenv("DAJUNG_ADMIN_PASSWORD", "demo-admin-001!")
 
@@ -260,10 +260,40 @@ def main() -> int:
         )
         mcp_menu = mcp_call("dajung.get_menu", {})
         require(mcp_menu["ok"] is True and len(mcp_menu["content"]["items"]) > 0, "MCP 메뉴 조회가 실패했습니다.")
+        mcp_order = mcp_call(
+            "dajung.submit_order",
+            {"source": "mcp", "items": [ORDER_ITEM]},
+            token=access_token,
+        )
+        require(mcp_order["ok"] is True, "MCP 주문 제출이 실패했습니다.")
+        require(mcp_order["content"]["source"] == "mcp", "MCP 주문 source가 mcp여야 합니다.")
+        mcp_payment = mcp_call(
+            "dajung.approve_dummy_payment",
+            {"order_id": mcp_order["content"]["id"], "idempotency_key": f"phase10-mcp-{run_id}"},
+            token=access_token,
+        )
+        require(mcp_payment["ok"] is True, "MCP 더미 결제 승인이 실패했습니다.")
+        require(mcp_payment["content"]["status"] == "approved", "MCP 더미 결제가 승인되어야 합니다.")
+        mcp_receipt = mcp_call(
+            "dajung.get_receipt",
+            {"order_id": mcp_order["content"]["id"]},
+            token=access_token,
+        )
+        require(mcp_receipt["ok"] is True, "MCP 영수증 조회가 실패했습니다.")
+        require(
+            mcp_receipt["content"]["order_id"] == mcp_order["content"]["id"],
+            "MCP 영수증이 MCP 주문과 연결되어야 합니다.",
+        )
+        mcp_recent_orders = mcp_call("dajung.list_recent_orders", {"limit": 20}, token=admin_token)
+        require(mcp_recent_orders["ok"] is True, "관리자 권한 MCP 최근 주문 조회가 실패했습니다.")
+        require(
+            any(order["id"] == mcp_order["content"]["id"] for order in mcp_recent_orders["content"]["orders"]),
+            "MCP 최근 주문 목록에 MCP 주문이 없습니다.",
+        )
         mcp_forbidden = mcp_call("dajung.list_recent_orders", {"limit": 3}, token=access_token)
         require(mcp_forbidden["ok"] is False, "일반 사용자 MCP 관리자 tool 호출은 실패해야 합니다.")
         require(mcp_forbidden["error"]["backend_status"] == 403, "MCP 실패 응답은 백엔드 403을 전달해야 합니다.")
-        pass_check("MCP tool 입력/출력 스키마와 실패 응답 확인")
+        pass_check("MCP tool 메뉴, 주문, 결제, 영수증, 최근 주문, 실패 응답 확인")
 
         print("[완료] Phase 10 통합 검증 스크립트가 모두 통과했습니다.")
         return 0
