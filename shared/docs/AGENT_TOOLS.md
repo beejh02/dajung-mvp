@@ -17,6 +17,7 @@ $env:BACKEND_API_BASE_URL = "http://127.0.0.1:8000"
 - 백엔드 `POST /auth/agent-handoff`로 handoff token 발급
 - Streamlit 사이드바에 token 입력
 - 또는 `http://127.0.0.1:8502/?handoff_token=<token>`으로 진입
+- handoff token이 없으면 사이드바에서 seed 데모 사용자 로그인, 이메일 로그인, 또는 JWT 직접 입력으로 Agent 세션 연결
 
 ## 모델 설정
 
@@ -25,14 +26,15 @@ $env:BACKEND_API_BASE_URL = "http://127.0.0.1:8000"
 ```text
 LLM_PROVIDER=stub
 AGENT_DEMO_MODE=true
-TARGET_MODEL_ID=models/gemma-4-26b-a4b-it
+LLM_MODEL=models/gemma-4-26b-a4b-it
+GEMINI_API_KEY=
 ```
 
 구현된 provider 경계:
 
 - `LLMProvider`: 모델 호출 추상 인터페이스
 - `StubLLMProvider`: 사용자 입력을 규칙 기반 intent JSON으로 변환하는 demo provider
-- `GoogleGeminiProvider`: 교체 지점만 준비되어 있으며 실제 API 호출은 미구현
+- `GoogleGeminiProvider`: `GEMINI_API_KEY`가 있을 때 Gemini REST API로 intent JSON 생성을 호출
 - `CloudflareWorkersAIProvider`: 교체 지점만 준비되어 있으며 실제 API 호출은 미구현
 
 `LLM_PROVIDER`가 실제 provider로 설정되어도 필요한 API Key가 없고 `AGENT_DEMO_MODE=true`이면 `StubLLMProvider`로 fallback합니다.
@@ -95,12 +97,11 @@ TARGET_MODEL_ID=models/gemma-4-26b-a4b-it
 
 - 결제 전에는 주문 구성과 총액을 확인합니다.
 - 비활성 메뉴나 옵션이 요청되면 대체 메뉴를 제안합니다.
-- 메뉴명 또는 수량이 부족하면 주문을 진행하지 않고 다시 묻습니다.
+- 메뉴명, 수량, 필수 옵션이 부족하면 주문을 진행하지 않고 다시 묻습니다.
 - 실제 결제가 아닌 더미 결제임을 안내합니다.
 - RAG, 음성 입력, STT, TTS는 사용하지 않습니다.
 
 ## 제한사항
 
-- 실제 LLM API 호출은 구현하지 않았습니다.
 - 자연어 파싱은 `StubLLMProvider`의 규칙 기반 demo 수준입니다.
 - React 키오스크에서 Streamlit으로 자동 이동하는 UI는 현재 구현되어 있지 않습니다. 시연 시 handoff token을 수동 또는 URL query로 전달합니다.

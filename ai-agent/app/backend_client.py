@@ -94,6 +94,39 @@ class BackendClient:
             user=dict(payload["user"]),
         )
 
+    def login(self, email: str, password: str) -> dict[str, Any]:
+        payload = self._request("POST", "/auth/login", body={"email": email, "password": password})
+        if not isinstance(payload, dict):
+            raise BackendApiError(None, payload, "로그인 응답이 올바르지 않습니다.")
+        return payload
+
+    def create_agent_handoff(self, access_token: str) -> str:
+        payload = self._request("POST", "/auth/agent-handoff", access_token=access_token)
+        if not isinstance(payload, dict) or not payload.get("handoff_token"):
+            raise BackendApiError(None, payload, "handoff token 응답이 올바르지 않습니다.")
+        return str(payload["handoff_token"])
+
+    def create_agent_session_from_access_token(self, access_token: str) -> AgentSession:
+        handoff_token = self.create_agent_handoff(access_token)
+        return self.exchange_agent_session(handoff_token)
+
+    def get_me(self, access_token: str) -> dict[str, Any]:
+        payload = self._request("GET", "/auth/me", access_token=access_token)
+        return dict(payload) if isinstance(payload, dict) else {}
+
+    def session_from_bearer_token(self, access_token: str) -> AgentSession:
+        try:
+            return self.create_agent_session_from_access_token(access_token)
+        except BackendApiError:
+            user = self.get_me(access_token)
+            return AgentSession(
+                access_token=access_token,
+                token_type="bearer",
+                expires_in=0,
+                token_use="manual",
+                user=user,
+            )
+
     def get_agent_menu(self, access_token: str) -> dict[str, Any]:
         payload = self._request("GET", "/agent/menu", access_token=access_token)
         return dict(payload) if isinstance(payload, dict) else {"items": []}

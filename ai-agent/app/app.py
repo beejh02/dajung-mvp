@@ -6,7 +6,13 @@ import streamlit as st
 
 from backend_client import AgentSession, BackendApiError, BackendClient
 from config import get_settings
-from model_client import IntentValidationError, ProviderConfigurationError, create_llm_provider, validate_intent
+from model_client import (
+    IntentValidationError,
+    LLMProviderError,
+    ProviderConfigurationError,
+    create_llm_provider,
+    validate_intent,
+)
 from session_handoff import exchange_handoff_token, get_handoff_token_from_query_params
 from tools.menu_tools import available_menu_summaries, get_menu
 from tools.order_tools import confirm_order, create_order_draft
@@ -40,6 +46,7 @@ def init_state() -> None:
     )
     st.session_state.setdefault("agent_session", None)
     st.session_state.setdefault("handled_handoff_token", None)
+    st.session_state.setdefault("pending_order_request", None)
     st.session_state.setdefault("pending_order_items", None)
     st.session_state.setdefault("pending_draft", None)
     st.session_state.setdefault("last_order_id", None)
@@ -148,12 +155,54 @@ def alternatives_text(alternatives: list[dict[str, Any]]) -> str:
     return "대신 주문 가능한 메뉴를 제안드립니다.\n" + "\n".join(items)
 
 
+def clarification_text(payload: dict[str, Any]) -> str:
+    reason = payload.get("reason")
+    menu_name = payload.get("menu_name") or "선택하신 메뉴"
+    pending_item = payload.get("pending_order_item", {})
+
+    if reason == "missing_quantity":
+        return f"{menu_name}을 몇 개 주문할까요? 예: '1개 주문할게요'"
+
+    if reason == "missing_options":
+        quantity = pending_item.get("quantity", 1) if isinstance(pending_item, dict) else 1
+        lines = [f"{menu_name} {quantity}개 주문을 위해 필수 옵션을 골라주세요."]
+        for group in payload.get("missing_option_groups", []):
+            choices = []
+            for choice in group.get("choices", []):
+                price_delta = int(choice.get("price_delta", 0))
+                suffix = f" (+{format_krw(price_delta)})" if price_delta else ""
+                choices.append(f"{choice.get('name')}{suffix}")
+            choice_text = ", ".join(choices) if choices else "선택 가능한 옵션 없음"
+            lines.append(f"- {group.get('name')}: {choice_text}")
+        return "\n".join(lines)
+
+    alternatives = payload.get("alternatives", [])
+    if alternatives:
+        return "주문 정보를 조금 더 확인해야 합니다.\n" + alternatives_text(alternatives)
+    return "메뉴명, 수량, 필요한 옵션을 함께 알려주세요. 예: '불고기버거 1개 주문할게요'"
+
+
 def connect_with_handoff(client: BackendClient, handoff_token: str) -> None:
     with st.spinner("Agent 세션을 연결하는 중입니다."):
         session = exchange_handoff_token(client, handoff_token)
     save_session(session)
     st.session_state.handled_handoff_token = handoff_token
     append_message("assistant", f"{session.user.get('name', '사용자')}님 세션이 연결되었습니다.")
+
+
+def connect_with_login(client: BackendClient, email: str, password: str) -> None:
+    with st.spinner("로그인 후 Agent 세션을 준비하는 중입니다."):
+        login_result = client.login(email, password)
+        session = client.create_agent_session_from_access_token(str(login_result["access_token"]))
+    save_session(session)
+    append_message("assistant", f"{session.user.get('name', '사용자')}님 Agent 세션이 연결되었습니다.")
+
+
+def connect_with_bearer_token(client: BackendClient, access_token: str) -> None:
+    with st.spinner("입력한 토큰으로 세션을 확인하는 중입니다."):
+        session = client.session_from_bearer_token(access_token.strip())
+    save_session(session)
+    append_message("assistant", f"{session.user.get('name', '사용자')}님 토큰 세션이 연결되었습니다.")
 
 
 def execute_intent(client: BackendClient, session: AgentSession, user_message: str) -> str:
@@ -164,7 +213,8 @@ def execute_intent(client: BackendClient, session: AgentSession, user_message: s
         {
             "system_prompt": st.session_state.system_prompt,
             "menu_items": menu_items,
-            "has_pending_draft": bool(st.session_state.pending_order_items),
+            "has_pending_draft": bool(st.session_state.pending_draft),
+            "pending_order_request": st.session_state.pending_order_request,
             "last_order_id": st.session_state.last_order_id,
         },
     )
@@ -172,6 +222,7 @@ def execute_intent(client: BackendClient, session: AgentSession, user_message: s
     try:
         intent = validate_intent(raw_intent)
     except IntentValidationError:
+        st.session_state.pending_order_request = None
         st.session_state.pending_order_items = None
         st.session_state.pending_draft = None
         return "주문 intent JSON을 이해하지 못했습니다. 메뉴명과 수량을 다시 입력해 주세요."
@@ -197,6 +248,13 @@ def execute_intent(client: BackendClient, session: AgentSession, user_message: s
         return f"{requested_name}은 현재 주문할 수 없습니다.\n{alternatives_text(intent.payload.get('alternatives', []))}"
 
     if intent.action == "ask_clarification":
+        pending_order_item = intent.payload.get("pending_order_item")
+        if isinstance(pending_order_item, dict):
+            st.session_state.pending_order_request = pending_order_item
+            st.session_state.pending_order_items = None
+            st.session_state.pending_draft = None
+            return clarification_text(intent.payload)
+
         alternatives = intent.payload.get("alternatives", [])
         if alternatives:
             return "주문할 메뉴를 정확히 확인하지 못했습니다.\n" + alternatives_text(alternatives)
@@ -210,6 +268,7 @@ def execute_intent(client: BackendClient, session: AgentSession, user_message: s
         if not items:
             return "주문 항목을 만들지 못했습니다. 메뉴명을 다시 입력해 주세요."
         draft = create_order_draft(client, session, items)
+        st.session_state.pending_order_request = None
         st.session_state.pending_order_items = items
         st.session_state.pending_draft = draft
         return draft_text(draft)
@@ -220,6 +279,9 @@ def execute_intent(client: BackendClient, session: AgentSession, user_message: s
             return "확정할 주문 초안이 없습니다. 먼저 메뉴와 수량을 입력해 주세요."
         order = confirm_order(client, session, items)
         payment_result = approve_dummy_payment(client, session, int(order["id"]))
+        payment_result["points"] = get_points_balance(client, session)
+        payment_result["receipt"] = get_receipt(client, session, int(order["id"]))
+        st.session_state.pending_order_request = None
         st.session_state.pending_order_items = None
         st.session_state.pending_draft = None
         st.session_state.last_order_id = int(order["id"])
@@ -252,20 +314,53 @@ def main() -> None:
         session = current_session()
         if session:
             st.success(f"{session.user.get('name', '사용자')}님 연결됨")
+            st.caption(f"토큰 종류: {session.token_use}")
             if st.button("세션 해제", type="secondary"):
                 st.session_state.agent_session = None
+                st.session_state.pending_order_request = None
                 st.session_state.pending_order_items = None
                 st.session_state.pending_draft = None
                 st.rerun()
         else:
-            st.info("handoff token으로 세션을 연결해 주세요.")
-            manual_token = st.text_input("handoff token", type="password", placeholder="React 앱에서 받은 token")
-            if st.button("세션 연결", type="primary", disabled=not manual_token):
-                try:
-                    connect_with_handoff(client, manual_token)
-                    st.rerun()
-                except BackendApiError as exc:
-                    st.error(f"세션 연결 실패: {exc}")
+            st.info("handoff token이 없으면 데모 사용자 또는 직접 로그인으로 Agent 세션을 만들 수 있습니다.")
+
+            if settings.demo_mode:
+                if st.button("데모 사용자로 시작", type="primary"):
+                    try:
+                        connect_with_login(client, "demo.user1@example.test", "demo-user-001!")
+                        st.rerun()
+                    except BackendApiError as exc:
+                        st.error(f"데모 로그인 실패: {exc}")
+
+            with st.expander("handoff token 연결", expanded=True):
+                manual_token = st.text_input("handoff token", type="password", placeholder="React 앱에서 받은 token")
+                if st.button("handoff token으로 연결", disabled=not manual_token):
+                    try:
+                        connect_with_handoff(client, manual_token)
+                        st.rerun()
+                    except BackendApiError as exc:
+                        st.error(f"세션 연결 실패: {exc}")
+
+            with st.expander("이메일로 로그인", expanded=False):
+                login_email = st.text_input("이메일", placeholder="demo.user1@example.test")
+                login_password = st.text_input("비밀번호", type="password")
+                if st.button("로그인 후 Agent 세션 만들기", disabled=not login_email or not login_password):
+                    try:
+                        connect_with_login(client, login_email, login_password)
+                        st.rerun()
+                    except BackendApiError as exc:
+                        st.error(f"로그인 실패: {exc}")
+
+            with st.expander("JWT 토큰 직접 입력", expanded=False):
+                bearer_token = st.text_input("Bearer JWT", type="password", placeholder="access 또는 agent token")
+                if st.button("JWT로 연결", disabled=not bearer_token):
+                    try:
+                        connect_with_bearer_token(client, bearer_token)
+                        st.rerun()
+                    except BackendApiError as exc:
+                        st.error(f"토큰 확인 실패: {exc}")
+
+            st.caption("데모 계정은 seed 데이터의 일반 사용자 계정으로 로그인합니다.")
 
         st.subheader("모델")
         st.write(f"Provider: `{provider.provider_name if provider else '설정 오류'}`")
@@ -276,6 +371,7 @@ def main() -> None:
 
         if st.button("대화 초기화"):
             st.session_state.messages = []
+            st.session_state.pending_order_request = None
             st.session_state.pending_order_items = None
             st.session_state.pending_draft = None
             append_message("assistant", "대화를 초기화했습니다. 다시 주문을 시작해 주세요.")
@@ -292,6 +388,8 @@ def main() -> None:
     pending_draft = st.session_state.get("pending_draft")
     if pending_draft:
         st.info("결제 전 확인 대기 중인 주문 초안이 있습니다. 채팅에 '확정' 또는 '결제'라고 입력하면 더미 결제가 진행됩니다.")
+    elif st.session_state.get("pending_order_request"):
+        st.info("주문 초안을 만들기 전에 추가 정보 확인이 필요합니다. 채팅으로 수량이나 옵션을 이어서 입력해 주세요.")
 
     render_messages()
 
@@ -302,7 +400,7 @@ def main() -> None:
     append_message("user", user_input)
     session = current_session()
     if session is None:
-        append_message("assistant", "세션이 연결되지 않았습니다. 먼저 handoff token으로 Agent 세션을 연결해 주세요.")
+        append_message("assistant", "세션이 연결되지 않았습니다. 사이드바에서 handoff token, 데모 사용자, 이메일 로그인, 또는 JWT 입력으로 Agent 세션을 연결해 주세요.")
         st.rerun()
 
     if provider is None:
@@ -314,6 +412,8 @@ def main() -> None:
             response = execute_intent(client, session, user_input)
     except BackendApiError as exc:
         response = f"백엔드 API 오류가 발생했습니다: {exc}"
+    except LLMProviderError as exc:
+        response = f"모델 응답을 처리하지 못했습니다: {exc}"
     except Exception:
         response = "알 수 없는 오류가 발생했습니다. 입력을 다시 확인해 주세요."
 
